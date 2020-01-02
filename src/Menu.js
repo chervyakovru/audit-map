@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default () => {
   return (
@@ -14,7 +14,7 @@ export default () => {
         type="button"
         uk-toggle="target: #offcanvas-usage"
       >
-        <span uk-icon="menu"></span>
+        <span uk-icon="menu" />
       </button>
 
       <div id="offcanvas-usage" uk-offcanvas="flip: true">
@@ -23,7 +23,7 @@ export default () => {
             className="uk-offcanvas-close"
             type="button"
             uk-close="true"
-          ></button>
+          />
 
           <h4>Меню</h4>
 
