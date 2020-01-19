@@ -9062,6 +9062,11 @@ react-scripts@3.3.0:
   optionalDependencies:
     fsevents "2.1.2"
 
+react-zoom-pan-pinch@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/react-zoom-pan-pinch/-/react-zoom-pan-pinch-1.6.0.tgz#5cfdce7093d29a2a764fcba59743ea1d5abf70ab"
+  integrity sha512-f8/2A202Vq9sVuxH3KM47fSWhaJOH14vdOyemO4lFvnZEWONlYsTWJ+8HTAPkwX8jvGC/wANYEXs1bv/UCUn0g==
+
 react@^16.12.0:
   version "16.12.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.12.0.tgz#0c0a9c6a142429e3614834d5a778e18aa78a0b83"
