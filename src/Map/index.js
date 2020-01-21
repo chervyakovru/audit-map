@@ -20,7 +20,7 @@ const getDots = dots => {
     return (
       <div
         key={dot.id}
-        className={styles.dot}
+        className={`${styles.dot} uk-position-absolute uk-transform-center`}
         style={{
           width: `${DOT_SIZE}px`,
           height: `${DOT_SIZE}px`,
@@ -33,7 +33,9 @@ const getDots = dots => {
           alert(`Вы нажали точку номер ${dot.id}`);
         }}
         onKeyPress={handleKeyPress}
-      />
+      >
+        <span>{dot.id}</span>
+      </div>
     );
   });
 };
@@ -63,11 +65,11 @@ const App = () => {
     console.log('onZoomChange: ', e);
   };
 
-  const onClick = (e, scale) => {
+  const onClick = e => {
     if (dragging) return;
     const rect = mapRef.current.getBoundingClientRect();
-    const posX = e.clientX - rect.left - (DOT_SIZE / 2) * scale;
-    const posY = e.clientY - rect.top - (DOT_SIZE / 2) * scale;
+    const posX = e.clientX - rect.left;
+    const posY = e.clientY - rect.top;
 
     const percentX = getRounded((posX / rect.width) * 100);
     const percentY = getRounded((posY / rect.height) * 100);
@@ -128,7 +130,7 @@ const App = () => {
           <TransformComponent>
             <div
               ref={mapRef}
-              onClick={e => onClick(e, scale)}
+              onClick={onClick}
               onKeyPress={handleKeyPress}
               className={styles.mapContainer}
               style={{
