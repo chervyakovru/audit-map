@@ -1,49 +1,38 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+
 import React from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import styled from 'styled-components';
+import { getRounded } from '../utils';
+import styles from './Map.module.css';
 
 import map from './map.jpg';
+import ZoomButtons from './ZoomButtons';
+import UndoButton from './UndoButton';
 
 const DOT_SIZE = 10;
 const MAP_SIZE = { width: 500, height: 354 };
 
 const handleKeyPress = () => {};
 
-const getRounded = number => Math.round(number * 100) / 100;
-
-const MapContainer = styled.div`
-  position: relative;
-  width: ${props => props.width}px;
-  height: ${props => props.height}px;
-  background-image: url(${props => props.src});
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  border: 1px solid gray;
-`;
-
-const Dot = styled.div`
-  width: ${DOT_SIZE}px;
-  height: ${DOT_SIZE}px;
-  border-radius: 50%;
-  background-color: red;
-  position: absolute;
-  left: ${props => props.left}%;
-  top: ${props => props.top}%;
-`;
-
 const getDots = dots => {
   return dots.map(dot => {
     return (
-      <Dot
+      <div
         key={dot.id}
-        left={dot.x}
-        top={dot.y}
+        className={styles.dot}
+        style={{
+          width: `${DOT_SIZE}px`,
+          height: `${DOT_SIZE}px`,
+          left: `${dot.x}%`,
+          top: `${dot.y}%`
+        }}
         onClick={e => {
           e.preventDefault();
           e.stopPropagation();
           alert(`Вы нажали точку номер ${dot.id}`);
         }}
+        onKeyPress={handleKeyPress}
       />
     );
   });
@@ -91,6 +80,10 @@ const App = () => {
     console.log('add new dot');
   };
 
+  const handleUndo = () => {
+    setLocations(locations.slice(0, -1));
+  };
+
   const defaultPosition = {
     x: (document.documentElement.clientWidth - MAP_SIZE.width) / 2,
     y: (document.documentElement.clientHeight - MAP_SIZE.height) / 2
@@ -99,13 +92,17 @@ const App = () => {
   return (
     <TransformWrapper
       options={{
-        limitToBounds: false
+        limitToBounds: false,
+        minScale: 0.5
       }}
       doubleClick={{
         disabled: true
       }}
       wheel={{
         step: 50
+      }}
+      zoomIn={{
+        step: 10
       }}
       defaultScale={1}
       defaultPositionX={defaultPosition.x}
@@ -118,29 +115,30 @@ const App = () => {
     >
       {({ zoomIn, zoomOut, resetTransform, scale }) => (
         <>
-          <div className="tools">
-            <button type="button" onClick={zoomIn}>
-              +
-            </button>
-            <button type="button" onClick={zoomOut}>
-              -
-            </button>
-            <button type="button" onClick={resetTransform}>
-              RESET
-            </button>
-          </div>
+          <UndoButton
+            handleUndo={handleUndo}
+            locationsLength={locations.length}
+          />
+          <ZoomButtons
+            zoomIn={zoomIn}
+            zoomOut={zoomOut}
+            resetTransform={resetTransform}
+            scale={scale}
+          />
           <TransformComponent>
-            <MapContainer
+            <div
               ref={mapRef}
               onClick={e => onClick(e, scale)}
               onKeyPress={handleKeyPress}
-              role="main"
-              width={MAP_SIZE.width}
-              height={MAP_SIZE.height}
-              src={map}
+              className={styles.mapContainer}
+              style={{
+                width: `${MAP_SIZE.width}px`,
+                height: `${MAP_SIZE.height}px`,
+                backgroundImage: `url(${map})`
+              }}
             >
               {getDots(locations)}
-            </MapContainer>
+            </div>
           </TransformComponent>
         </>
       )}

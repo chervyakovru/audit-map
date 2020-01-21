@@ -1,0 +1,28 @@
+.mapContainer {
+  position: relative;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: 1px solid #e5e5e5;
+}
+
+.dot {
+  border-radius: 50%;
+  background-color: red;
+  position: absolute;
+}
+
+.button {
+  display: block;
+  color: #000;
+  text-decoration: none;
+  user-select: none;
+}
+.button:focus {
+  color: #000;
+  text-decoration: none;
+}
+.button:not(:disabled):hover {
+  color: #1e87f0;
+  text-decoration: none;
+}
