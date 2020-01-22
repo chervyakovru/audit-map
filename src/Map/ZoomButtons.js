@@ -12,11 +12,12 @@ const ZoomButtons = props => {
   const [fullscreen, setFullscreen] = React.useState(false);
 
   React.useEffect(() => {
-    document.addEventListener('fullscreenchange', () => {
+    const setter = () => {
       setFullscreen(document.fullscreenElement);
-    });
+    };
+    document.addEventListener('fullscreenchange', setter);
     return () => {
-      document.removeEventListener('fullscreenchange');
+      document.removeEventListener('fullscreenchange', setter);
     };
   }, []);
 
