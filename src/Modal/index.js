@@ -3,6 +3,8 @@ import UIkit from 'uikit';
 import useStoreon from 'storeon/react';
 import styles from './Modal.module.css';
 
+import Options from './Options';
+
 const Modal = () => {
   const nameInputRef = React.useRef(null);
   const { dispatch, currentPointId, points } = useStoreon(
@@ -14,7 +16,7 @@ const Modal = () => {
 
   React.useEffect(() => {
     return UIkit.util.on('#modal-container', 'hidden', () => {
-      dispatch('currentPoint/seId', null);
+      dispatch('currentPoint/setId', null);
     });
   }, []);
 
@@ -39,13 +41,16 @@ const Modal = () => {
           type="button"
           uk-close="true"
         />
-        <input
-          ref={nameInputRef}
-          className={`${styles.title} uk-h4`}
-          type="text"
-          value={currentPoint ? currentPoint.name : ''}
-          onChange={onNameSave}
-        />
+        <div className="uk-flex uk-flex-column">
+          <input
+            ref={nameInputRef}
+            className={`${styles.title} uk-h4`}
+            type="text"
+            value={currentPoint && currentPoint.name ? currentPoint.name : ''}
+            onChange={onNameSave}
+          />
+          <Options currentPoint={currentPoint} />
+        </div>
       </div>
     </div>
   );

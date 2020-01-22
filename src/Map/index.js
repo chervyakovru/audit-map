@@ -44,7 +44,8 @@ const App = () => {
       x: percentX,
       y: percentY,
       id: points.length,
-      name: `Точка ${points.length}`
+      name: `Точка ${points.length}`,
+      violationsId: []
     });
   };
 

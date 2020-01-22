@@ -20,3 +20,9 @@
   color: #666;
   text-decoration: none;
 }
+.option {
+  cursor: pointer;
+}
+.checkbox {
+  margin-top: 4px;
+}
