@@ -1,0 +1,39 @@
+.mapContainer {
+  position: relative;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: 1px solid #e5e5e5;
+}
+
+.dot {
+  border-radius: 50%;
+  background-color: #1e87f0;
+  cursor: pointer;
+}
+
+.dot span {
+  color: #fff;
+  font-size: 6px;
+  line-height: 1;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.button {
+  display: block;
+  color: #000;
+  text-decoration: none;
+  user-select: none;
+}
+.button:focus {
+  color: #000;
+  text-decoration: none;
+}
+.button:not(:disabled):hover {
+  color: #1e87f0;
+  text-decoration: none;
+}
