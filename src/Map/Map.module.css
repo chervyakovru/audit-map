@@ -9,6 +9,7 @@
 .dot {
   border-radius: 50%;
   background-color: #1e87f0;
+  cursor: pointer;
 }
 
 .dot span {
