@@ -1,0 +1,22 @@
+.title {
+  border: none;
+  outline: none;
+  border-bottom: 1px solid transparent;
+}
+.title:focus {
+  border-bottom-color: #333;
+}
+.button {
+  display: block;
+  color: #999;
+  text-decoration: none;
+  user-select: none;
+}
+.button:focus {
+  color: #999;
+  text-decoration: none;
+}
+.button:not(:disabled):hover {
+  color: #666;
+  text-decoration: none;
+}
