@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-
 import React from 'react';
 import {
   MdAdd,
@@ -7,7 +5,8 @@ import {
   MdFullscreen,
   MdFullscreenExit
 } from 'react-icons/md';
-import styles from './Map.module.css';
+
+import Button from './Button';
 
 const ZoomButtons = props => {
   const [fullscreen, setFullscreen] = React.useState(false);
@@ -46,48 +45,26 @@ const ZoomButtons = props => {
               uk-position-bottom-right
             "
     >
-      <button
-        type="button"
-        onClick={zoomOut}
-        className={`${styles.button} uk-button uk-button-link uk-padding-small`}
-        uk-tooltip="title: Уменьшить; delay: 1500"
-      >
+      <Button onClick={zoomOut} tooltip="Уменьшить">
         <MdRemove size="25px" />
-      </button>
-      <button
-        type="button"
-        onClick={zoomIn}
-        className={`${styles.button} uk-button uk-button-link uk-padding-small`}
-        uk-tooltip="title: Увеличить; delay: 1500"
-      >
+      </Button>
+      <Button onClick={zoomIn} tooltip="Увеличить">
         <MdAdd size="25px" />
-      </button>
-      <button
-        type="button"
-        onClick={resetTransform}
-        className={`${styles.button} uk-button uk-button-link uk-padding-small`}
-        uk-tooltip="title: Масштаб 100%; delay: 1500"
-      >
+      </Button>
+      <Button onClick={resetTransform} tooltip="Масштаб 100%">
         <b>{Math.round(scale * 100)}%</b>
-      </button>
+      </Button>
       {fullscreen ? (
-        <button
-          type="button"
+        <Button
           onClick={exitFullscreen}
-          className={`${styles.button} uk-button uk-button-link uk-padding-small`}
-          uk-tooltip="title: Выйти из полноэкранного режима; delay: 1500"
+          tooltip="Выйти из полноэкранного режима"
         >
           <MdFullscreenExit size="25px" />
-        </button>
+        </Button>
       ) : (
-        <button
-          type="button"
-          onClick={launchFullscreen}
-          className={`${styles.button} uk-button uk-button-link uk-padding-small`}
-          uk-tooltip="title: Развернуть на весь экран; delay: 1500"
-        >
+        <Button onClick={launchFullscreen} tooltip="Развернуть на весь экран">
           <MdFullscreen size="25px" />
-        </button>
+        </Button>
       )}
     </div>
   );
