@@ -12,7 +12,7 @@ const handleKeyPress = () => {};
 const Dot = props => {
   const { dispatch } = useStoreon('currentPointId');
 
-  const { id, x, y } = props;
+  const { point } = props;
 
   return (
     <div
@@ -20,18 +20,19 @@ const Dot = props => {
       style={{
         width: `${DOT_SIZE}px`,
         height: `${DOT_SIZE}px`,
-        left: `${x}%`,
-        top: `${y}%`
+        left: `${point.x}%`,
+        top: `${point.y}%`
       }}
       onClick={e => {
         e.preventDefault();
         e.stopPropagation();
-        dispatch('currentPoint/seId', id);
+        dispatch('currentPoint/setId', point.id);
         UIkit.modal('#modal-container').show();
       }}
       onKeyPress={handleKeyPress}
+      uk-tooltip={point.name ? `title: ${point.name}; delay: 500` : ''}
     >
-      <span>{id}</span>
+      <span>{point.id}</span>
     </div>
   );
 };

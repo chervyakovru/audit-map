@@ -40,7 +40,12 @@ const App = () => {
     const percentX = getRounded((posX / rect.width) * 100);
     const percentY = getRounded((posY / rect.height) * 100);
 
-    dispatch('points/add', { x: percentX, y: percentY, id: points.length });
+    dispatch('points/add', {
+      x: percentX,
+      y: percentY,
+      id: points.length,
+      name: `Точка ${points.length}`
+    });
   };
 
   const handleUndo = () => {
@@ -95,7 +100,7 @@ const App = () => {
               }}
             >
               {points.map(point => (
-                <Point key={point.id} x={point.x} y={point.y} id={point.id} />
+                <Point key={point.id} point={point} />
               ))}
             </div>
           </TransformComponent>
