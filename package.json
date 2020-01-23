@@ -1,9 +1,11 @@
 {
-  "name": "audite-map",
+  "name": "audit-map",
   "version": "0.1.0",
   "private": true,
   "homepage": "https://chervyakov.ru/projects/audit/",
   "dependencies": {
+    "@storeon/crosstab": "^0.4.1",
+    "@storeon/localstorage": "^0.9.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -13,6 +15,7 @@
     "react-icons": "^3.8.0",
     "react-scripts": "3.3.0",
     "react-zoom-pan-pinch": "^1.6.0",
+    "storeon": "^0.9.8",
     "uikit": "^3.2.6"
   },
   "scripts": {
