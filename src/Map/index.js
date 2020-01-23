@@ -1,68 +1,34 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 
 import React from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import useStoreon from 'storeon/react';
+
 import { getRounded } from '../utils';
 import styles from './Map.module.css';
 
-import map from './map.jpg';
 import ZoomButtons from './ZoomButtons';
 import UndoButton from './UndoButton';
+import Point from './Point';
+import map from './map.jpg';
 
-const DOT_SIZE = 10;
 const MAP_SIZE = { width: 500, height: 354 };
 
 const handleKeyPress = () => {};
 
-const getDots = dots => {
-  return dots.map(dot => {
-    return (
-      <div
-        key={dot.id}
-        className={`${styles.dot} uk-position-absolute uk-transform-center`}
-        style={{
-          width: `${DOT_SIZE}px`,
-          height: `${DOT_SIZE}px`,
-          left: `${dot.x}%`,
-          top: `${dot.y}%`
-        }}
-        onClick={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          alert(`Вы нажали точку номер ${dot.id}`);
-        }}
-        onKeyPress={handleKeyPress}
-      >
-        <span>{dot.id}</span>
-      </div>
-    );
-  });
-};
-
 const App = () => {
   const [dragging, setDragging] = React.useState(false);
   const mapRef = React.useRef(null);
-  const [locations, setLocations] = React.useState([]);
-
-  const onPanningStart = () => {
-    console.log('onPanningStart');
-  };
+  const { dispatch, points } = useStoreon('points');
 
   const onPanning = () => {
-    console.log('onPanning');
     setDragging(true);
   };
 
   const onPanningStop = () => {
-    console.log('onPanningStop');
     setTimeout(() => {
       setDragging(false);
     }, 100);
-  };
-
-  const onZoomChange = e => {
-    console.log('onZoomChange: ', e);
   };
 
   const onClick = e => {
@@ -74,16 +40,17 @@ const App = () => {
     const percentX = getRounded((posX / rect.width) * 100);
     const percentY = getRounded((posY / rect.height) * 100);
 
-    setLocations([
-      ...locations,
-      { x: percentX, y: percentY, id: locations.length }
-    ]);
-
-    console.log('add new dot');
+    dispatch('points/add', {
+      x: percentX,
+      y: percentY,
+      id: points.length,
+      name: `Точка ${points.length}`,
+      violationsId: []
+    });
   };
 
   const handleUndo = () => {
-    setLocations(locations.slice(0, -1));
+    dispatch('points/pop');
   };
 
   const defaultPosition = {
@@ -109,18 +76,12 @@ const App = () => {
       defaultScale={1}
       defaultPositionX={defaultPosition.x}
       defaultPositionY={defaultPosition.y}
-      style={{ width: '100%', height: '100%' }}
-      onPanningStart={onPanningStart}
       onPanning={onPanning}
       onPanningStop={onPanningStop}
-      onZoomChange={onZoomChange}
     >
       {({ zoomIn, zoomOut, resetTransform, scale }) => (
         <>
-          <UndoButton
-            handleUndo={handleUndo}
-            locationsLength={locations.length}
-          />
+          <UndoButton handleUndo={handleUndo} pointsLength={points.length} />
           <ZoomButtons
             zoomIn={zoomIn}
             zoomOut={zoomOut}
@@ -139,7 +100,9 @@ const App = () => {
                 backgroundImage: `url(${map})`
               }}
             >
-              {getDots(locations)}
+              {points.map(point => (
+                <Point key={point.id} point={point} />
+              ))}
             </div>
           </TransformComponent>
         </>
