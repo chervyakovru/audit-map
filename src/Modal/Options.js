@@ -3,6 +3,7 @@
 import React from 'react';
 import UIkit from 'uikit';
 import useStoreon from 'storeon/react';
+import firebase from '../firebase';
 
 import Option from './Option';
 
@@ -15,6 +16,20 @@ const Options = props => {
     return UIkit.util.on('#modal-container', 'hidden', () => {
       setSearchValue('');
     });
+  }, []);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const db = firebase.firestore();
+      const data = await db.collection('expertReport').get();
+
+      const fetchViolations = data.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      dispatch('violations/set', fetchViolations);
+    };
+    fetchData();
   }, []);
 
   const onSelectOption = e => {
