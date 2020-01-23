@@ -32,7 +32,6 @@ const Dot = props => {
       <span className={styles.circle}>
         <span className={styles.title}>{point.id}</span>
       </span>
-      <span className={styles.dash} />
     </div>
   );
 };
