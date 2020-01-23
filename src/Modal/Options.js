@@ -1,14 +1,21 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import React from 'react';
+import UIkit from 'uikit';
 import useStoreon from 'storeon/react';
 
 import Option from './Option';
 
 const Options = props => {
+  const [searchValue, setSearchValue] = React.useState('');
   const { dispatch, violations } = useStoreon('violations');
-
   const { currentPoint } = props;
+
+  React.useEffect(() => {
+    return UIkit.util.on('#modal-container', 'hidden', () => {
+      setSearchValue('');
+    });
+  }, []);
 
   const onSelectOption = e => {
     const { target } = e;
@@ -31,6 +38,11 @@ const Options = props => {
     }
   };
 
+  const isChecked = optionId => {
+    if (!currentPoint || !currentPoint.violationsId) return false;
+    return currentPoint.violationsId.includes(optionId.toString());
+  };
+
   return (
     <>
       <form className="uk-search uk-search-default uk-width-1-1 uk-margin-bottom">
@@ -39,6 +51,8 @@ const Options = props => {
           className="uk-search-input"
           type="search"
           placeholder="Введите 3 символа для начала поиска..."
+          value={searchValue}
+          onChange={e => setSearchValue(e.target.value)}
         />
       </form>
       <div uk-overflow-auto="true">
@@ -46,7 +60,7 @@ const Options = props => {
           <Option
             key={option.id}
             id={option.id}
-            checked={option.checked}
+            checked={isChecked(option.id)}
             text={option.text}
             onChange={onSelectOption}
           />
