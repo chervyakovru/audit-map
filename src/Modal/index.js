@@ -6,7 +6,6 @@ import styles from './Modal.module.css';
 import Options from './Options';
 
 const Modal = () => {
-  const nameInputRef = React.useRef(null);
   const { dispatch, currentPointId, points } = useStoreon(
     'currentPointId',
     'points'
@@ -21,10 +20,8 @@ const Modal = () => {
   }, []);
 
   React.useEffect(() => {
-    if (currentPoint && !currentPoint.name) {
-      nameInputRef.current.focus();
-    }
-  });
+    console.log('currentPointId is changed! now is: ', currentPointId);
+  }, [currentPointId]);
 
   const onNameSave = e => {
     dispatch('points/update', {
@@ -43,7 +40,6 @@ const Modal = () => {
         />
         <div className="uk-flex uk-flex-column">
           <input
-            ref={nameInputRef}
             className={`${styles.title} uk-h4`}
             type="text"
             value={currentPoint && currentPoint.name ? currentPoint.name : ''}
