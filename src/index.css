@@ -30,3 +30,22 @@ body,
   height: 100%;
   background-color: #f8f8f8;
 }
+
+.uk-modal {
+  z-index: 1040;
+}
+
+@media only screen and (max-width: 576px) {
+  .uk-modal {
+    padding: 0;
+  }
+  .uk-modal-body {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  [class*='uk-modal-close-'] {
+    top: 0;
+    right: 0;
+    padding: 16px;
+  }
+}
