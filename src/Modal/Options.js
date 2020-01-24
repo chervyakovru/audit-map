@@ -6,9 +6,17 @@ import useStoreon from 'storeon/react';
 import firebase from '../firebase';
 
 import Option from './Option';
+import styles from './Modal.module.css';
+
+const ELEMENTS_OFFSET = 20;
 
 const Options = props => {
   const [searchValue, setSearchValue] = React.useState('');
+  const [violationsLoaded, setViolationsLoaded] = React.useState(false);
+  const [visibleViolations, setVisibleViolations] = React.useState([]);
+  const [visibleElementsCount, setVisibleElementsCount] = React.useState(
+    ELEMENTS_OFFSET
+  );
   const { dispatch, violations } = useStoreon('violations');
   const { currentPoint } = props;
 
@@ -28,6 +36,12 @@ const Options = props => {
         ...doc.data()
       }));
       dispatch('violations/set', fetchViolations);
+      const search = fetchViolations.map(violation => ({
+        ...violation,
+        foundIndexes: []
+      }));
+      setVisibleViolations(search);
+      setViolationsLoaded(true);
     };
     fetchData();
   }, []);
@@ -58,6 +72,78 @@ const Options = props => {
     return currentPoint.violationsId.includes(optionId.toString());
   };
 
+  const updateVisibleViolations = value => {
+    if (value.length === 0) {
+      setVisibleViolations(violations);
+      return;
+    }
+    const valueTLC = value.toLowerCase();
+    const search = violations.reduce((acc, violation) => {
+      const textTLC = violation.text.toLowerCase();
+      let currentIndex = 0;
+      let indexFound = textTLC.indexOf(valueTLC, currentIndex);
+      if (indexFound === -1) {
+        return acc;
+      }
+      currentIndex = indexFound + value.length;
+      // ищем все вхождения
+      const allEntry = [];
+      do {
+        allEntry.push(indexFound);
+        indexFound = textTLC.indexOf(valueTLC, currentIndex);
+        currentIndex = indexFound + value.length;
+      } while (indexFound !== -1);
+      return [
+        ...acc,
+        {
+          ...violation,
+          foundIndexes: allEntry
+        }
+      ];
+    }, []);
+
+    setVisibleViolations(search);
+    setVisibleElementsCount(ELEMENTS_OFFSET);
+  };
+
+  const onChange = e => {
+    const { value } = e.target;
+    setSearchValue(value);
+    updateVisibleViolations(value);
+  };
+
+  const getText = (text, foundIndexes, searchLength) => {
+    if (searchLength === 0) return <span>{text}</span>;
+
+    const output = [text.slice(0, foundIndexes[0])];
+
+    for (let i = 0; i < foundIndexes.length; i += 1) {
+      output.push(
+        <>
+          <span className={styles.selected}>
+            {text.slice(foundIndexes[i], foundIndexes[i] + searchLength)}
+          </span>
+          {i < foundIndexes.length - 1
+            ? text.slice(foundIndexes[i] + searchLength, foundIndexes[i + 1])
+            : text.slice(foundIndexes[i] + searchLength)}
+        </>
+      );
+    }
+    return output;
+  };
+
+  const clearSearch = () => {
+    setSearchValue('');
+    updateVisibleViolations('');
+  };
+
+  const onScroll = e => {
+    const el = e.target;
+    if (el.scrollHeight - el.scrollTop === el.clientHeight) {
+      setVisibleElementsCount(visibleElementsCount + ELEMENTS_OFFSET);
+    }
+  };
+
   return (
     <>
       <form className="uk-search uk-search-default uk-width-1-1 uk-margin-bottom">
@@ -65,21 +151,43 @@ const Options = props => {
         <input
           className="uk-search-input"
           type="search"
-          placeholder="Введите 3 символа для начала поиска..."
+          placeholder="Поиск..."
           value={searchValue}
-          onChange={e => setSearchValue(e.target.value)}
+          onChange={onChange}
         />
-      </form>
-      <div uk-overflow-auto="true">
-        {violations.map(option => (
-          <Option
-            key={option.id}
-            id={option.id}
-            checked={isChecked(option.id)}
-            text={option.text}
-            onChange={onSelectOption}
+        {searchValue.length !== 0 && (
+          <button
+            id="clear-search"
+            type="button"
+            className="uk-position-center-right uk-padding-small"
+            uk-close="true"
+            onClick={clearSearch}
           />
-        ))}
+        )}
+      </form>
+      <div uk-overflow-auto="true" onScroll={onScroll}>
+        {!violationsLoaded && <div uk-spinner="true" />}
+        {violationsLoaded &&
+          (visibleViolations.length === 0 ? (
+            <p>Нет совпадений</p>
+          ) : (
+            visibleViolations.slice(0, visibleElementsCount).map(option => {
+              const text = getText(
+                option.text,
+                option.foundIndexes,
+                searchValue.length
+              );
+              return (
+                <Option
+                  key={`${searchValue}_${option.id}`}
+                  id={option.id}
+                  checked={isChecked(option.id)}
+                  text={text}
+                  onChange={onSelectOption}
+                />
+              );
+            })
+          ))}
       </div>
     </>
   );
