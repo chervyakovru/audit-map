@@ -26,3 +26,6 @@
 .checkbox {
   margin-top: 4px;
 }
+.selected {
+  background-color: rgba(30, 135, 240, 0.3);
+}
