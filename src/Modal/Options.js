@@ -8,10 +8,15 @@ import firebase from '../firebase';
 import Option from './Option';
 import styles from './Modal.module.css';
 
+const ELEMENTS_OFFSET = 20;
+
 const Options = props => {
   const [searchValue, setSearchValue] = React.useState('');
   const [violationsLoaded, setViolationsLoaded] = React.useState(false);
   const [visibleViolations, setVisibleViolations] = React.useState([]);
+  const [visibleElementsCount, setVisibleElementsCount] = React.useState(
+    ELEMENTS_OFFSET
+  );
   const { dispatch, violations } = useStoreon('violations');
   const { currentPoint } = props;
 
@@ -72,7 +77,6 @@ const Options = props => {
       setVisibleViolations(violations);
       return;
     }
-
     const valueTLC = value.toLowerCase();
     const search = violations.reduce((acc, violation) => {
       const textTLC = violation.text.toLowerCase();
@@ -99,6 +103,7 @@ const Options = props => {
     }, []);
 
     setVisibleViolations(search);
+    setVisibleElementsCount(ELEMENTS_OFFSET);
   };
 
   const onChange = e => {
@@ -132,6 +137,13 @@ const Options = props => {
     updateVisibleViolations('');
   };
 
+  const onScroll = e => {
+    const el = e.target;
+    if (el.scrollHeight - el.scrollTop === el.clientHeight) {
+      setVisibleElementsCount(visibleElementsCount + ELEMENTS_OFFSET);
+    }
+  };
+
   return (
     <>
       <form className="uk-search uk-search-default uk-width-1-1 uk-margin-bottom">
@@ -153,34 +165,29 @@ const Options = props => {
           />
         )}
       </form>
-      <div uk-overflow-auto="true">
+      <div uk-overflow-auto="true" onScroll={onScroll}>
         {!violationsLoaded && <div uk-spinner="true" />}
-        {
-          (violationsLoaded && visibleViolations.length === 0 && (
+        {violationsLoaded &&
+          (visibleViolations.length === 0 ? (
             <p>Нет совпадений</p>
-          ),
-          violationsLoaded &&
-            visibleViolations.length !== 0 &&
-            visibleViolations.reduce((acc, option) => {
+          ) : (
+            visibleViolations.slice(0, visibleElementsCount).map(option => {
               const text = getText(
                 option.text,
                 option.foundIndexes,
                 searchValue.length
               );
-              if (!text) return acc;
-
-              return [
-                ...acc,
+              return (
                 <Option
-                  key={option.id}
+                  key={`${searchValue}_${option.id}`}
                   id={option.id}
                   checked={isChecked(option.id)}
                   text={text}
                   onChange={onSelectOption}
                 />
-              ];
-            }, []))
-        }
+              );
+            })
+          ))}
       </div>
     </>
   );
