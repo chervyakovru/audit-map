@@ -15,7 +15,7 @@ const Option = props => {
           onChange={onChange}
           name={id}
         />
-        <span className="uk-display-inline-block">{text}</span>
+        <span>{text}</span>
       </label>
     </div>
   );
