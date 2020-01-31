@@ -1,15 +1,29 @@
 import React from 'react';
 import UIkit from 'uikit';
 import useStoreon from 'storeon/react';
+import { useParams } from 'react-router-dom';
+
 import styles from './Modal.module.css';
 
 import Options from './Options';
 
 const Modal = () => {
-  const { dispatch, currentPointId, points } = useStoreon(
+  const { dispatch, currentPointId, documents } = useStoreon(
     'currentPointId',
-    'points'
+    'documents'
   );
+  const { id } = useParams();
+
+  const getDoc = () => {
+    const doc = documents.find(el => {
+      return el.id === id;
+    });
+    if (!doc) return null;
+    return doc;
+  };
+
+  const doc = getDoc();
+  const { points } = doc;
 
   const currentPoint = points.find(point => point.id === currentPointId);
 
@@ -19,14 +33,13 @@ const Modal = () => {
     });
   }, []);
 
-  React.useEffect(() => {
-    console.log('currentPointId is changed! now is: ', currentPointId);
-  }, [currentPointId]);
-
   const onNameSave = e => {
-    dispatch('points/update', {
-      ...currentPoint,
-      name: e.target.value
+    dispatch('document/points/update', {
+      docId: doc.id,
+      point: {
+        ...currentPoint,
+        name: e.target.value
+      }
     });
   };
 
@@ -45,7 +58,7 @@ const Modal = () => {
             value={currentPoint && currentPoint.name ? currentPoint.name : ''}
             onChange={onNameSave}
           />
-          <Options currentPoint={currentPoint} />
+          <Options docId={doc.id} currentPoint={currentPoint} />
         </div>
       </div>
     </div>

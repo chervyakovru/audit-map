@@ -3,7 +3,7 @@
 import React from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import useStoreon from 'storeon/react';
-
+import { useParams } from 'react-router-dom';
 import { getRounded } from '../utils';
 import styles from './Map.module.css';
 
@@ -16,10 +16,20 @@ const MAP_SIZE = { width: 500, height: 354 };
 
 const handleKeyPress = () => {};
 
-const App = () => {
+const MapComponent = () => {
   const [dragging, setDragging] = React.useState(false);
   const mapRef = React.useRef(null);
-  const { dispatch, points } = useStoreon('points');
+  const { dispatch, documents } = useStoreon('documents');
+  const { id } = useParams();
+
+  const getDoc = () => {
+    const doc = documents.find(el => el.id === id);
+    if (!doc) return null;
+    return doc;
+  };
+
+  const doc = getDoc();
+  const { points } = doc;
 
   const onPanning = () => {
     setDragging(true);
@@ -40,17 +50,20 @@ const App = () => {
     const percentX = getRounded((posX / rect.width) * 100);
     const percentY = getRounded((posY / rect.height) * 100);
 
-    dispatch('points/add', {
-      x: percentX,
-      y: percentY,
-      id: points.length,
-      name: `Точка ${points.length}`,
-      violationsId: []
+    dispatch('document/points/add', {
+      docId: doc.id,
+      point: {
+        x: percentX,
+        y: percentY,
+        id: points.length,
+        name: `Точка ${points.length}`,
+        violationsId: []
+      }
     });
   };
 
   const handleUndo = () => {
-    dispatch('points/pop');
+    dispatch('document/points/pop', doc.id);
   };
 
   const defaultPosition = {
@@ -81,7 +94,11 @@ const App = () => {
     >
       {({ zoomIn, zoomOut, resetTransform, scale }) => (
         <>
-          <UndoButton handleUndo={handleUndo} pointsLength={points.length} />
+          <UndoButton
+            docName={doc.name}
+            handleUndo={handleUndo}
+            pointsLength={points.length}
+          />
           <ZoomButtons
             zoomIn={zoomIn}
             zoomOut={zoomOut}
@@ -111,4 +128,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default MapComponent;
