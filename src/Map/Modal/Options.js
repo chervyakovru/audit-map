@@ -3,7 +3,7 @@
 import React from 'react';
 import UIkit from 'uikit';
 import useStoreon from 'storeon/react';
-import firebase from '../firebase';
+import firebase from '../../firebase';
 
 import Option from './Option';
 import styles from './Modal.module.css';
