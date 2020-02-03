@@ -1,5 +1,13 @@
 import map from '../Map/map.jpg';
 
+const getEmptyDoc = id => ({
+  id,
+  name: 'Без названия',
+  lastUpdate: '2020-01-24T21:50:00+00:00',
+  thumbnailSrc: null,
+  points: []
+});
+
 export default function(store) {
   store.on('@init', () => ({
     documents: [
@@ -18,6 +26,29 @@ export default function(store) {
   store.on('documents/add', ({ documents }, doc) => ({
     documents: [...documents, doc]
   }));
+  store.on('documents/addNew', ({ documents }) => {
+    const ids = documents.map(el => parseInt(el.id, 10));
+    const newId = Math.max(...ids) + 1;
+    const doc = getEmptyDoc(newId.toString());
+    const newDocuments = [...documents, doc];
+    return {
+      documents: newDocuments
+    };
+  });
+  store.on('document/rename', ({ documents }, { docId, newName }) => {
+    const newDocuments = documents.map(el => {
+      if (el.id !== docId) {
+        return el;
+      }
+      return {
+        ...el,
+        name: newName
+      };
+    });
+    return {
+      documents: newDocuments
+    };
+  });
   store.on('document/duplicate', ({ documents }, docId) => {
     const doc = documents.find(el => el.id === docId);
     const ids = documents.map(el => parseInt(el.id, 10));
