@@ -8,7 +8,7 @@ import styles from './Map.module.css';
 
 const handleKeyPress = () => {};
 
-const Dot = props => {
+const Point = props => {
   const { dispatch } = useStoreon('currentPointId');
 
   const { point } = props;
@@ -36,4 +36,4 @@ const Dot = props => {
   );
 };
 
-export default Dot;
+export default Point;
