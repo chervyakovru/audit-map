@@ -3,7 +3,7 @@
 import React from 'react';
 import UIkit from 'uikit';
 import useStoreon from 'storeon/react';
-import firebase from '../firebase';
+import firebase from '../../firebase';
 
 import Option from './Option';
 import styles from './Modal.module.css';
@@ -13,12 +13,12 @@ const ELEMENTS_OFFSET = 20;
 const Options = props => {
   const [searchValue, setSearchValue] = React.useState('');
   const [violationsLoaded, setViolationsLoaded] = React.useState(false);
-  const [visibleViolations, setVisibleViolations] = React.useState([]);
+  const [visibleViolations, setVisibleViolations] = React.useState(null);
   const [visibleElementsCount, setVisibleElementsCount] = React.useState(
     ELEMENTS_OFFSET
   );
-  const { dispatch, violations } = useStoreon('violations');
-  const { currentPoint } = props;
+  const { dispatch, violations } = useStoreon('violations', 'documents');
+  const { currentPoint, docId } = props;
 
   React.useEffect(() => {
     return UIkit.util.on('#modal-container', 'hidden', () => {
@@ -40,6 +40,7 @@ const Options = props => {
         ...violation,
         foundIndexes: []
       }));
+
       setVisibleViolations(search);
       setViolationsLoaded(true);
     };
@@ -52,16 +53,23 @@ const Options = props => {
     const { name } = target;
 
     if (!value) {
-      dispatch('points/update', {
-        ...currentPoint,
-        violationsId: currentPoint.violationsId.filter(id => id !== name)
+      dispatch('document/points/update', {
+        docId,
+        point: {
+          ...currentPoint,
+          violationsId: currentPoint.violationsId.filter(id => id !== name)
+        }
       });
     } else {
       const isContain = currentPoint.violationsId.find(id => id === name);
+
       if (!isContain) {
-        dispatch('points/update', {
-          ...currentPoint,
-          violationsId: [...currentPoint.violationsId, name]
+        dispatch('document/points/update', {
+          docId,
+          point: {
+            ...currentPoint,
+            violationsId: [...currentPoint.violationsId, name]
+          }
         });
       }
     }
@@ -116,7 +124,6 @@ const Options = props => {
     if (searchLength === 0) return <span>{text}</span>;
 
     const output = [text.slice(0, foundIndexes[0])];
-
     for (let i = 0; i < foundIndexes.length; i += 1) {
       output.push(
         <>
