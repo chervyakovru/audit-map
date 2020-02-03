@@ -1,12 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import useStoreon from 'storeon/react';
 
 import { GoPlusSmall } from 'react-icons/go';
 import styles from './Dashboard.module.css';
 
-const AddNewCard = () => (
-  <Link to="/board/0" className="uk-link-reset">
+const AddNewCard = () => {
+  const { dispatch } = useStoreon('documents');
+
+  const createNewBoard = e => {
+    dispatch('documents/addNew');
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  return (
     <div
+      role="button"
+      onClick={createNewBoard}
+      onKeyPress={() => {}}
+      tabIndex={0}
       className={`${styles.addNewCard}
         uk-card
         uk-card-primary
@@ -20,7 +32,7 @@ const AddNewCard = () => (
         Новый документ
       </p>
     </div>
-  </Link>
-);
+  );
+};
 
 export default AddNewCard;
