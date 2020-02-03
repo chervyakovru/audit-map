@@ -29,9 +29,18 @@ const Card = ({ doc }) => {
   };
 
   const onDelete = e => {
-    dispatch('document/delete', doc.id);
     e.preventDefault();
     e.stopPropagation();
+    UIkit.dropdown(dropdownRef.current).hide();
+    setSelected(false);
+
+    UIkit.modal
+      .confirm('Вы уверены, что хотите удалить проект?', {
+        labels: { cancel: 'Отмена', ok: 'Да' }
+      })
+      .then(() => {
+        dispatch('document/delete', doc.id);
+      });
   };
 
   return (
