@@ -3,6 +3,7 @@ import UIkit from 'uikit';
 import { Link } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 import { MdMoreHoriz } from 'react-icons/md';
+import { AiOutlineFileImage } from 'react-icons/ai';
 
 import { useOutsideClick, notificationDate } from '../utils';
 
@@ -18,6 +19,16 @@ const Card = ({ doc }) => {
 
   const onSelect = () => {
     setSelected(true);
+  };
+
+  const onRename = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    UIkit.dropdown(dropdownRef.current).hide();
+    setSelected(false);
+    UIkit.modal.prompt('Name:', doc.name).then(res => {
+      dispatch('document/rename', { docId: doc.id, newName: res });
+    });
   };
 
   const onDouble = e => {
@@ -45,7 +56,7 @@ const Card = ({ doc }) => {
 
   return (
     <div
-      className={`${styles.card}
+      className={`
         uk-card
         uk-card-default
         uk-card-small
@@ -54,11 +65,18 @@ const Card = ({ doc }) => {
       onMouseLeave={() => setSelected(false)}
     >
       <div
-        className={`${styles.imageContainer}
+        className={`
+          ${styles.imageContainer}
           uk-position-relative
           uk-card-media-top`}
       >
-        <img src={doc.thumbnailSrc} alt="map" />
+        {doc.thumbnailSrc ? (
+          <img src={doc.thumbnailSrc} alt="map" />
+        ) : (
+          <div className="uk-position-center">
+            <AiOutlineFileImage size="80px" />
+          </div>
+        )}
         {selected && <div className={styles.imageOverlay} />}
       </div>
       <div className="uk-card-body uk-flex uk-flex-column">
@@ -99,7 +117,11 @@ const Card = ({ doc }) => {
       >
         <ul className={`${styles.dropdown} uk-nav uk-dropdown-nav`}>
           <li>
-            <button type="button" className={styles.listElement}>
+            <button
+              onClick={onRename}
+              type="button"
+              className={styles.listElement}
+            >
               Переименовать
             </button>
           </li>
