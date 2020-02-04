@@ -1,16 +1,30 @@
 import React from 'react';
-import useStoreon from 'storeon/react';
 
 import { GoPlusSmall } from 'react-icons/go';
+import firebase from '../firebase';
+
 import styles from './Dashboard.module.css';
 
-const AddNewCard = () => {
-  const { dispatch } = useStoreon('documents');
+const initialDocument = {
+  name: 'Без названия',
+  thumbnailSrc: null,
+  points: []
+};
 
-  const createNewBoard = e => {
-    dispatch('documents/addNew');
-    e.preventDefault();
-    e.stopPropagation();
+const AddNewCard = () => {
+  const createNewBoard = () => {
+    const db = firebase.firestore();
+    db.collection('documents')
+      .add({
+        ...initialDocument,
+        lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(function(docRef) {
+        console.log('Document written with ID: ', docRef.id);
+      })
+      .catch(function(error) {
+        console.error('Error adding document: ', error);
+      });
   };
 
   return (
@@ -23,7 +37,7 @@ const AddNewCard = () => {
         uk-card
         uk-card-primary
         uk-card-small
-        uk-height-1-1`}
+        uk-height-medium`}
     >
       <div className="uk-position-center">
         <GoPlusSmall size={60} color="#fff" />
