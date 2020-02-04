@@ -1,45 +1,31 @@
 import React from 'react';
 import UIkit from 'uikit';
-import useStoreon from 'storeon/react';
-import { useParams } from 'react-router-dom';
-
-import styles from './Modal.module.css';
+import { getDocRef } from '../../Dashboard/api';
 
 import Options from './Options';
 
-const Modal = () => {
-  const { dispatch, currentPointId, documents } = useStoreon(
-    'currentPointId',
-    'documents'
-  );
-  const { id } = useParams();
+import styles from './Modal.module.css';
 
-  const getDoc = () => {
-    const doc = documents.find(el => {
-      return el.id === id;
-    });
-    if (!doc) return null;
-    return doc;
-  };
-
-  const doc = getDoc();
-  const { points } = doc;
-
-  const currentPoint = points.find(point => point.id === currentPointId);
-
+const Modal = ({ doc, selectedPoint, setSelectedPointId }) => {
   React.useEffect(() => {
     return UIkit.util.on('#modal-container', 'hidden', () => {
-      dispatch('currentPoint/setId', null);
+      setSelectedPointId(null);
     });
   }, []);
 
-  const onNameSave = e => {
-    dispatch('document/points/update', {
-      docId: doc.id,
-      point: {
-        ...currentPoint,
-        name: e.target.value
-      }
+  const onRename = e => {
+    const name = e.target.value;
+    const documentRef = getDocRef(doc.id);
+    const { points } = doc;
+    const newPoints = points.map(point => {
+      if (point.id !== selectedPoint.id) return point;
+      return {
+        ...point,
+        name
+      };
+    });
+    documentRef.update({
+      points: newPoints
     });
   };
 
@@ -55,10 +41,12 @@ const Modal = () => {
           <input
             className={`${styles.title} uk-h4`}
             type="text"
-            value={currentPoint && currentPoint.name ? currentPoint.name : ''}
-            onChange={onNameSave}
+            value={
+              selectedPoint && selectedPoint.name ? selectedPoint.name : ''
+            }
+            onChange={onRename}
           />
-          <Options docId={doc.id} currentPoint={currentPoint} />
+          <Options doc={doc} selectedPoint={selectedPoint} />
         </div>
       </div>
     </div>
