@@ -34,8 +34,7 @@ const shortMonthNames = [
   'Дек'
 ];
 
-export const notificationDate = rawTime => {
-  const date = new Date(rawTime);
+export const notificationDate = date => {
   const day = date.getDate();
   const monthNumber = date.getMonth();
   const month = shortMonthNames[monthNumber];

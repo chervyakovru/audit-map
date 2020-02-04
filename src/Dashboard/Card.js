@@ -26,9 +26,15 @@ const Card = ({ doc }) => {
     e.stopPropagation();
     UIkit.dropdown(dropdownRef.current).hide();
     setSelected(false);
-    UIkit.modal.prompt('Name:', doc.name).then(res => {
-      dispatch('document/rename', { docId: doc.id, newName: res });
-    });
+    UIkit.modal
+      .prompt('Name:', doc.name, {
+        labels: { cancel: 'Отмена', ok: 'Да' },
+        bgClose: true,
+        escClose: true
+      })
+      .then(res => {
+        dispatch('document/rename', { docId: doc.id, newName: res });
+      });
   };
 
   const onDouble = e => {
@@ -47,7 +53,9 @@ const Card = ({ doc }) => {
 
     UIkit.modal
       .confirm('Вы уверены, что хотите удалить проект?', {
-        labels: { cancel: 'Отмена', ok: 'Да' }
+        labels: { cancel: 'Отмена', ok: 'Да' },
+        bgClose: true,
+        escClose: true
       })
       .then(() => {
         dispatch('document/delete', doc.id);
@@ -60,6 +68,7 @@ const Card = ({ doc }) => {
         uk-card
         uk-card-default
         uk-card-small
+        uk-height-medium
         uk-position-relative`}
       onMouseEnter={() => setSelected(true)}
       onMouseLeave={() => setSelected(false)}
@@ -82,7 +91,7 @@ const Card = ({ doc }) => {
       <div className="uk-card-body uk-flex uk-flex-column">
         <p className="uk-margin-remove-bottom uk-text-truncate">{doc.name}</p>
         <small className="uk-text-truncate" style={{ height: '19px' }}>
-          {selected && `Изменено ${notificationDate(doc.lastUpdate)}`}
+          {selected && `Изменено ${notificationDate(doc.lastUpdate.toDate())}`}
         </small>
       </div>
       <Link
