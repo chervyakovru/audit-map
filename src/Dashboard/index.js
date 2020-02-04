@@ -1,17 +1,18 @@
 import React from 'react';
-import firebase from '../firebase';
 
 import Header from './Header';
 import Card from './Card';
 import AddNewCard from './AddNewCard';
+
+import { getDocCollection } from './api';
 
 const Dashboard = () => {
   const [documents, setDocuments] = React.useState([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const db = firebase.firestore();
-      const query = db.collection('documents').orderBy('lastUpdate', 'desc');
+      const collection = getDocCollection();
+      const query = collection.orderBy('lastUpdate', 'desc');
 
       const response = await query.get();
       const fetchedDocuments = response.docs.map(doc => {
@@ -26,8 +27,8 @@ const Dashboard = () => {
   }, []);
 
   React.useEffect(() => {
-    const db = firebase.firestore();
-    const query = db.collection('documents').orderBy('lastUpdate', 'desc');
+    const collection = getDocCollection();
+    const query = collection.orderBy('lastUpdate', 'desc');
 
     query.onSnapshot(querySnapshot => {
       const fetchedDocuments = querySnapshot.docs.map(doc => {
