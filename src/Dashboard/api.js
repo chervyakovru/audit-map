@@ -1,5 +1,10 @@
 import firebase from '../firebase';
 
+export const getERCollection = () => {
+  const db = firebase.firestore();
+  return db.collection('expertReport');
+};
+
 export const getDocCollection = () => {
   const db = firebase.firestore();
   return db.collection('documents');

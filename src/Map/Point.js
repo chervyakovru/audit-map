@@ -2,17 +2,12 @@
 
 import React from 'react';
 import UIkit from 'uikit';
-import useStoreon from 'storeon/react';
 
 import styles from './Map.module.css';
 
 const handleKeyPress = () => {};
 
-const Point = props => {
-  const { dispatch } = useStoreon('currentPointId');
-
-  const { point } = props;
-
+const Point = ({ point, setSelectedPointId }) => {
   return (
     <div
       className={`${styles.dot} uk-position-absolute`}
@@ -23,7 +18,7 @@ const Point = props => {
       onClick={e => {
         e.preventDefault();
         e.stopPropagation();
-        dispatch('currentPoint/setId', point.id);
+        setSelectedPointId(point.id);
         UIkit.modal('#modal-container').show();
       }}
       onKeyPress={handleKeyPress}
