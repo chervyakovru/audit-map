@@ -62,7 +62,7 @@ const MapComponent = () => {
     });
   };
 
-  const handleUndo = () => {
+  const onUndo = () => {
     dispatch('document/points/pop', doc.id);
   };
 
@@ -96,7 +96,7 @@ const MapComponent = () => {
         <>
           <UndoButton
             docName={doc.name}
-            handleUndo={handleUndo}
+            handleUndo={onUndo}
             pointsLength={points.length}
           />
           <ZoomButtons
