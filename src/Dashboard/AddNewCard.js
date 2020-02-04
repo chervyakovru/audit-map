@@ -14,15 +14,17 @@ const initialDocument = {
 const AddNewCard = () => {
   const createNewBoard = () => {
     const db = firebase.firestore();
-    db.collection('documents')
+    const collection = db.collection('documents');
+
+    collection
       .add({
         ...initialDocument,
         lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
       })
-      .then(function(docRef) {
+      .then(docRef => {
         console.log('Document written with ID: ', docRef.id);
       })
-      .catch(function(error) {
+      .catch(error => {
         console.error('Error adding document: ', error);
       });
   };
