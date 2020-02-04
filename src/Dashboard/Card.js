@@ -1,10 +1,11 @@
 import React from 'react';
 import UIkit from 'uikit';
 import { Link } from 'react-router-dom';
-import useStoreon from 'storeon/react';
+
 import { MdMoreHoriz } from 'react-icons/md';
 import { AiOutlineFileImage } from 'react-icons/ai';
 
+import { getDocCollection, getDocRef, getFbTimestamp } from './api';
 import { useOutsideClick, notificationDate } from '../utils';
 
 import styles from './Dashboard.module.css';
@@ -13,7 +14,6 @@ const Card = ({ doc }) => {
   const [selected, setSelected] = React.useState(false);
   const moreButtonRef = React.useRef();
   const dropdownRef = React.useRef();
-  const { dispatch } = useStoreon('documents');
 
   useOutsideClick(moreButtonRef, () => setSelected(false));
 
@@ -26,23 +26,53 @@ const Card = ({ doc }) => {
     e.stopPropagation();
     UIkit.dropdown(dropdownRef.current).hide();
     setSelected(false);
+
     UIkit.modal
       .prompt('Name:', doc.name, {
         labels: { cancel: 'Отмена', ok: 'Да' },
         bgClose: true,
         escClose: true
       })
-      .then(res => {
-        dispatch('document/rename', { docId: doc.id, newName: res });
-      });
+      .then(
+        name => {
+          const documentRef = getDocRef(doc.id);
+
+          documentRef
+            .update({ name })
+            .then(() => {
+              console.log('Document successfully updated!');
+            })
+            .catch(error => {
+              console.error('Error updating document: ', error);
+            });
+        },
+        () => {
+          console.log('Canceled rename document');
+        }
+      );
   };
 
   const onDouble = e => {
-    dispatch('document/duplicate', doc.id);
-    UIkit.dropdown(dropdownRef.current).hide();
-    setSelected(false);
     e.preventDefault();
     e.stopPropagation();
+    UIkit.dropdown(dropdownRef.current).hide();
+    setSelected(false);
+
+    const collection = getDocCollection();
+
+    const { id, ...docWithoutId } = doc;
+    collection
+      .add({
+        ...docWithoutId,
+        name: `${doc.name} (Копия)`,
+        lastUpdate: getFbTimestamp()
+      })
+      .then(docRef => {
+        console.log('Document written with ID: ', docRef.id);
+      })
+      .catch(error => {
+        console.error('Error adding document: ', error);
+      });
   };
 
   const onDelete = e => {
@@ -57,10 +87,26 @@ const Card = ({ doc }) => {
         bgClose: true,
         escClose: true
       })
-      .then(() => {
-        dispatch('document/delete', doc.id);
-      });
+      .then(
+        () => {
+          const collection = getDocCollection();
+          collection
+            .doc(doc.id)
+            .delete()
+            .then(() => {
+              console.log('Document successfully deleted!');
+            })
+            .catch(error => {
+              console.error('Error adding document: ', error);
+            });
+        },
+        () => {
+          console.log('Canceled delete document');
+        }
+      );
   };
+
+  const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();
 
   return (
     <div
@@ -91,7 +137,7 @@ const Card = ({ doc }) => {
       <div className="uk-card-body uk-flex uk-flex-column">
         <p className="uk-margin-remove-bottom uk-text-truncate">{doc.name}</p>
         <small className="uk-text-truncate" style={{ height: '19px' }}>
-          {selected && `Изменено ${notificationDate(doc.lastUpdate.toDate())}`}
+          {selected && `Изменено ${notificationDate(lastUpdateDate)}`}
         </small>
       </div>
       <Link
@@ -148,7 +194,7 @@ const Card = ({ doc }) => {
             <button
               onClick={onDelete}
               type="button"
-              className={styles.listElement}
+              className={`${styles.listElement} uk-text-danger`}
             >
               Удалить
             </button>
