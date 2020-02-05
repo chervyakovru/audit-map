@@ -1,17 +1,45 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { GoPlusSmall } from 'react-icons/go';
+import firebase from '../firebase';
+
 import styles from './Dashboard.module.css';
 
-const AddNewCard = () => (
-  <Link to="/board/0" className="uk-link-reset">
+const initialDocument = {
+  name: 'Без названия',
+  thumbnailSrc: null,
+  points: []
+};
+
+const AddNewCard = () => {
+  const createNewBoard = () => {
+    const db = firebase.firestore();
+    const collection = db.collection('documents');
+
+    collection
+      .add({
+        ...initialDocument,
+        lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(docRef => {
+        console.log('Document written with ID: ', docRef.id);
+      })
+      .catch(error => {
+        console.error('Error adding document: ', error);
+      });
+  };
+
+  return (
     <div
+      role="button"
+      onClick={createNewBoard}
+      onKeyPress={() => {}}
+      tabIndex={0}
       className={`${styles.addNewCard}
         uk-card
         uk-card-primary
         uk-card-small
-        uk-height-1-1`}
+        uk-height-medium`}
     >
       <div className="uk-position-center">
         <GoPlusSmall size={60} color="#fff" />
@@ -20,7 +48,7 @@ const AddNewCard = () => (
         Новый документ
       </p>
     </div>
-  </Link>
-);
+  );
+};
 
 export default AddNewCard;

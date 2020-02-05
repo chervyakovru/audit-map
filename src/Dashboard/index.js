@@ -1,12 +1,45 @@
 import React from 'react';
-import useStoreon from 'storeon/react';
 
 import Header from './Header';
 import Card from './Card';
 import AddNewCard from './AddNewCard';
 
+import { getDocCollection } from './api';
+
 const Dashboard = () => {
-  const { documents } = useStoreon('documents');
+  const [documents, setDocuments] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const collection = getDocCollection();
+      const query = collection.orderBy('lastUpdate', 'desc');
+
+      const response = await query.get();
+      const fetchedDocuments = response.docs.map(doc => {
+        return {
+          id: doc.id,
+          ...doc.data()
+        };
+      });
+      setDocuments(fetchedDocuments);
+    };
+    fetchData();
+  }, []);
+
+  React.useEffect(() => {
+    const collection = getDocCollection();
+    const query = collection.orderBy('lastUpdate', 'desc');
+
+    query.onSnapshot(querySnapshot => {
+      const fetchedDocuments = querySnapshot.docs.map(doc => {
+        return {
+          id: doc.id,
+          ...doc.data()
+        };
+      });
+      setDocuments(fetchedDocuments);
+    });
+  }, []);
 
   return (
     <>

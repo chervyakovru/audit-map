@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-
 import React from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import useStoreon from 'storeon/react';
-import { useParams } from 'react-router-dom';
+
+import { getDocRef } from '../Dashboard/api';
+
 import { getRounded } from '../utils';
 import styles from './Map.module.css';
 
@@ -16,20 +16,9 @@ const MAP_SIZE = { width: 500, height: 354 };
 
 const handleKeyPress = () => {};
 
-const MapComponent = () => {
+const MapComponent = ({ doc, setSelectedPointId }) => {
   const [dragging, setDragging] = React.useState(false);
   const mapRef = React.useRef(null);
-  const { dispatch, documents } = useStoreon('documents');
-  const { id } = useParams();
-
-  const getDoc = () => {
-    const doc = documents.find(el => el.id === id);
-    if (!doc) return null;
-    return doc;
-  };
-
-  const doc = getDoc();
-  const { points } = doc;
 
   const onPanning = () => {
     setDragging(true);
@@ -50,26 +39,35 @@ const MapComponent = () => {
     const percentX = getRounded((posX / rect.width) * 100);
     const percentY = getRounded((posY / rect.height) * 100);
 
-    dispatch('document/points/add', {
-      docId: doc.id,
-      point: {
-        x: percentX,
-        y: percentY,
-        id: points.length,
-        name: `Точка ${points.length}`,
-        violationsId: []
-      }
+    const { points } = doc;
+    const point = {
+      x: percentX,
+      y: percentY,
+      id: points.length,
+      name: `Точка ${points.length}`,
+      violationsId: []
+    };
+
+    const docRef = getDocRef(doc.id);
+    docRef.update({
+      points: [...points, point]
     });
   };
 
-  const handleUndo = () => {
-    dispatch('document/points/pop', doc.id);
+  const onUndo = () => {
+    const { points } = doc;
+
+    const docRef = getDocRef(doc.id);
+    docRef.update({
+      points: points.slice(0, -1)
+    });
   };
 
   const defaultPosition = {
     x: (document.documentElement.clientWidth - MAP_SIZE.width) / 2,
     y: (document.documentElement.clientHeight - MAP_SIZE.height) / 2
   };
+  if (!doc) return null;
 
   return (
     <TransformWrapper
@@ -96,8 +94,8 @@ const MapComponent = () => {
         <>
           <UndoButton
             docName={doc.name}
-            handleUndo={handleUndo}
-            pointsLength={points.length}
+            handleUndo={onUndo}
+            pointsLength={doc.points.length}
           />
           <ZoomButtons
             zoomIn={zoomIn}
@@ -117,8 +115,12 @@ const MapComponent = () => {
                 backgroundImage: `url(${map})`
               }}
             >
-              {points.map(point => (
-                <Point key={point.id} point={point} />
+              {doc.points.map(point => (
+                <Point
+                  key={point.id}
+                  point={point}
+                  setSelectedPointId={setSelectedPointId}
+                />
               ))}
             </div>
           </TransformComponent>

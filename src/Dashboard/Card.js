@@ -1,9 +1,11 @@
 import React from 'react';
 import UIkit from 'uikit';
 import { Link } from 'react-router-dom';
-import useStoreon from 'storeon/react';
-import { MdMoreHoriz } from 'react-icons/md';
 
+import { MdMoreHoriz } from 'react-icons/md';
+import { AiOutlineFileImage } from 'react-icons/ai';
+
+import { getDocCollection, getDocRef, getFbTimestamp } from './api';
 import { useOutsideClick, notificationDate } from '../utils';
 
 import styles from './Dashboard.module.css';
@@ -12,7 +14,6 @@ const Card = ({ doc }) => {
   const [selected, setSelected] = React.useState(false);
   const moreButtonRef = React.useRef();
   const dropdownRef = React.useRef();
-  const { dispatch } = useStoreon('documents');
 
   useOutsideClick(moreButtonRef, () => setSelected(false));
 
@@ -20,12 +21,58 @@ const Card = ({ doc }) => {
     setSelected(true);
   };
 
-  const onDouble = e => {
-    dispatch('document/duplicate', doc.id);
-    UIkit.dropdown(dropdownRef.current).hide();
-    setSelected(false);
+  const onRename = e => {
     e.preventDefault();
     e.stopPropagation();
+    UIkit.dropdown(dropdownRef.current).hide();
+    setSelected(false);
+
+    UIkit.modal
+      .prompt('Name:', doc.name, {
+        labels: { cancel: 'Отмена', ok: 'Да' },
+        bgClose: true,
+        escClose: true
+      })
+      .then(
+        name => {
+          const documentRef = getDocRef(doc.id);
+
+          documentRef
+            .update({ name })
+            .then(() => {
+              console.log('Document successfully updated!');
+            })
+            .catch(error => {
+              console.error('Error updating document: ', error);
+            });
+        },
+        () => {
+          console.log('Canceled rename document');
+        }
+      );
+  };
+
+  const onDouble = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    UIkit.dropdown(dropdownRef.current).hide();
+    setSelected(false);
+
+    const collection = getDocCollection();
+
+    const { id, ...docWithoutId } = doc;
+    collection
+      .add({
+        ...docWithoutId,
+        name: `${doc.name} (Копия)`,
+        lastUpdate: getFbTimestamp()
+      })
+      .then(docRef => {
+        console.log('Document written with ID: ', docRef.id);
+      })
+      .catch(error => {
+        console.error('Error adding document: ', error);
+      });
   };
 
   const onDelete = e => {
@@ -36,35 +83,61 @@ const Card = ({ doc }) => {
 
     UIkit.modal
       .confirm('Вы уверены, что хотите удалить проект?', {
-        labels: { cancel: 'Отмена', ok: 'Да' }
+        labels: { cancel: 'Отмена', ok: 'Да' },
+        bgClose: true,
+        escClose: true
       })
-      .then(() => {
-        dispatch('document/delete', doc.id);
-      });
+      .then(
+        () => {
+          const collection = getDocCollection();
+          collection
+            .doc(doc.id)
+            .delete()
+            .then(() => {
+              console.log('Document successfully deleted!');
+            })
+            .catch(error => {
+              console.error('Error adding document: ', error);
+            });
+        },
+        () => {
+          console.log('Canceled delete document');
+        }
+      );
   };
+
+  const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();
 
   return (
     <div
-      className={`${styles.card}
+      className={`
         uk-card
         uk-card-default
         uk-card-small
+        uk-height-medium
         uk-position-relative`}
       onMouseEnter={() => setSelected(true)}
       onMouseLeave={() => setSelected(false)}
     >
       <div
-        className={`${styles.imageContainer}
+        className={`
+          ${styles.imageContainer}
           uk-position-relative
           uk-card-media-top`}
       >
-        <img src={doc.thumbnailSrc} alt="map" />
+        {doc.thumbnailSrc ? (
+          <img src={doc.thumbnailSrc} alt="map" />
+        ) : (
+          <div className="uk-position-center">
+            <AiOutlineFileImage size="80px" />
+          </div>
+        )}
         {selected && <div className={styles.imageOverlay} />}
       </div>
       <div className="uk-card-body uk-flex uk-flex-column">
         <p className="uk-margin-remove-bottom uk-text-truncate">{doc.name}</p>
         <small className="uk-text-truncate" style={{ height: '19px' }}>
-          {selected && `Изменено ${notificationDate(doc.lastUpdate)}`}
+          {selected && `Изменено ${notificationDate(lastUpdateDate)}`}
         </small>
       </div>
       <Link
@@ -99,7 +172,11 @@ const Card = ({ doc }) => {
       >
         <ul className={`${styles.dropdown} uk-nav uk-dropdown-nav`}>
           <li>
-            <button type="button" className={styles.listElement}>
+            <button
+              onClick={onRename}
+              type="button"
+              className={styles.listElement}
+            >
               Переименовать
             </button>
           </li>
@@ -117,7 +194,7 @@ const Card = ({ doc }) => {
             <button
               onClick={onDelete}
               type="button"
-              className={styles.listElement}
+              className={`${styles.listElement} uk-text-danger`}
             >
               Удалить
             </button>

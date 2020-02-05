@@ -2,23 +2,20 @@
 
 import React from 'react';
 import UIkit from 'uikit';
-import useStoreon from 'storeon/react';
-import firebase from '../../firebase';
+import { getERCollection, getDocRef } from '../../Dashboard/api';
 
 import Option from './Option';
 import styles from './Modal.module.css';
 
 const ELEMENTS_OFFSET = 20;
 
-const Options = props => {
+const Options = ({ selectedPoint, doc }) => {
   const [searchValue, setSearchValue] = React.useState('');
-  const [violationsLoaded, setViolationsLoaded] = React.useState(false);
+  const [violations, setViolations] = React.useState(null);
   const [visibleViolations, setVisibleViolations] = React.useState(null);
   const [visibleElementsCount, setVisibleElementsCount] = React.useState(
     ELEMENTS_OFFSET
   );
-  const { dispatch, violations } = useStoreon('violations', 'documents');
-  const { currentPoint, docId } = props;
 
   React.useEffect(() => {
     return UIkit.util.on('#modal-container', 'hidden', () => {
@@ -28,61 +25,74 @@ const Options = props => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const db = firebase.firestore();
-      const data = await db.collection('expertReport').get();
+      const collection = getERCollection();
+      const data = await collection.get();
 
-      const fetchViolations = data.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      dispatch('violations/set', fetchViolations);
-      const search = fetchViolations.map(violation => ({
-        ...violation,
-        foundIndexes: []
+      const fetchedViolations = data.docs.map(violation => ({
+        id: violation.id,
+        ...violation.data()
       }));
 
-      setVisibleViolations(search);
-      setViolationsLoaded(true);
+      setViolations(fetchedViolations);
+      setVisibleViolations(fetchedViolations);
     };
     fetchData();
   }, []);
 
-  const onSelectOption = e => {
+  const removeViolationId = (points, violationId) => {
+    return points.map(point => {
+      if (point.id !== selectedPoint.id) return point;
+      return {
+        ...point,
+        violationsId: selectedPoint.violationsId.filter(
+          id => id !== violationId
+        )
+      };
+    });
+  };
+
+  const addViolationId = (points, violationId) => {
+    return points.map(point => {
+      if (point.id !== selectedPoint.id) return point;
+      return {
+        ...point,
+        violationsId: [...selectedPoint.violationsId, violationId]
+      };
+    });
+  };
+
+  const onSelectOption = async e => {
     const { target } = e;
     const value = target.checked;
-    const { name } = target;
+    const violationId = target.name;
+    const { points } = doc;
+
+    let newPoints = points;
+    const isContain = selectedPoint.violationsId.find(id => id === violationId);
 
     if (!value) {
-      dispatch('document/points/update', {
-        docId,
-        point: {
-          ...currentPoint,
-          violationsId: currentPoint.violationsId.filter(id => id !== name)
-        }
-      });
+      if (!isContain) return;
+      newPoints = removeViolationId(points, violationId);
     } else {
-      const isContain = currentPoint.violationsId.find(id => id === name);
-
-      if (!isContain) {
-        dispatch('document/points/update', {
-          docId,
-          point: {
-            ...currentPoint,
-            violationsId: [...currentPoint.violationsId, name]
-          }
-        });
-      }
+      if (isContain) return;
+      newPoints = addViolationId(points, violationId);
     }
+
+    const docRef = getDocRef(doc.id);
+    docRef.update({
+      points: newPoints
+    });
   };
 
   const isChecked = optionId => {
-    if (!currentPoint || !currentPoint.violationsId) return false;
-    return currentPoint.violationsId.includes(optionId.toString());
+    if (!selectedPoint || !selectedPoint.violationsId) return false;
+    return selectedPoint.violationsId.includes(optionId.toString());
   };
 
   const updateVisibleViolations = value => {
     if (value.length === 0) {
       setVisibleViolations(violations);
+      setVisibleElementsCount(ELEMENTS_OFFSET);
       return;
     }
     const valueTLC = value.toLowerCase();
@@ -101,38 +111,44 @@ const Options = props => {
         indexFound = textTLC.indexOf(valueTLC, currentIndex);
         currentIndex = indexFound + value.length;
       } while (indexFound !== -1);
-      return [
-        ...acc,
-        {
-          ...violation,
-          foundIndexes: allEntry
-        }
-      ];
+
+      const violationWithIndexes = {
+        ...violation,
+        foundIndexes: allEntry
+      };
+      return [...acc, violationWithIndexes];
     }, []);
 
     setVisibleViolations(search);
     setVisibleElementsCount(ELEMENTS_OFFSET);
   };
 
+  React.useEffect(() => {
+    updateVisibleViolations(searchValue);
+  }, [searchValue]);
+
   const onChange = e => {
     const { value } = e.target;
     setSearchValue(value);
-    updateVisibleViolations(value);
   };
 
   const getText = (text, foundIndexes, searchLength) => {
-    if (searchLength === 0) return <span>{text}</span>;
+    if (searchLength === 0 || !foundIndexes || foundIndexes.length === 0)
+      return <span>{text}</span>;
 
     const output = [text.slice(0, foundIndexes[0])];
+
     for (let i = 0; i < foundIndexes.length; i += 1) {
+      const startMatch = foundIndexes[i];
+      const endMatch = startMatch + searchLength;
       output.push(
         <>
           <span className={styles.selected}>
-            {text.slice(foundIndexes[i], foundIndexes[i] + searchLength)}
+            {text.slice(startMatch, endMatch)}
           </span>
           {i < foundIndexes.length - 1
-            ? text.slice(foundIndexes[i] + searchLength, foundIndexes[i + 1])
-            : text.slice(foundIndexes[i] + searchLength)}
+            ? text.slice(endMatch, foundIndexes[i + 1])
+            : text.slice(endMatch)}
         </>
       );
     }
@@ -141,7 +157,6 @@ const Options = props => {
 
   const clearSearch = () => {
     setSearchValue('');
-    updateVisibleViolations('');
   };
 
   const onScroll = e => {
@@ -173,8 +188,8 @@ const Options = props => {
         )}
       </form>
       <div uk-overflow-auto="true" onScroll={onScroll}>
-        {!violationsLoaded && <div uk-spinner="true" />}
-        {violationsLoaded &&
+        {!visibleViolations && <div uk-spinner="true" />}
+        {visibleViolations &&
           (visibleViolations.length === 0 ? (
             <p>Нет совпадений</p>
           ) : (
