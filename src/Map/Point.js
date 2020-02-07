@@ -1,7 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-
 import React from 'react';
-import UIkit from 'uikit';
 
 import styles from './Map.module.css';
 
@@ -19,7 +17,6 @@ const Point = ({ point, setSelectedPointId }) => {
         e.preventDefault();
         e.stopPropagation();
         setSelectedPointId(point.id);
-        UIkit.modal('#modal-container').show();
       }}
       onKeyPress={handleKeyPress}
       uk-tooltip={point.name ? `title: ${point.name}; delay: 500` : ''}

@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import React from 'react';
-import UIkit from 'uikit';
 import { getERCollection, getDocRef } from '../../Dashboard/api';
 
 import Option from './Option';
@@ -9,19 +8,12 @@ import styles from './Modal.module.css';
 
 const ELEMENTS_OFFSET = 20;
 
-const Options = ({ selectedPoint, doc }) => {
-  const [searchValue, setSearchValue] = React.useState('');
+const Options = ({ selectedPoint, doc, searchValue, setSearchValue }) => {
   const [violations, setViolations] = React.useState(null);
   const [visibleViolations, setVisibleViolations] = React.useState(null);
   const [visibleElementsCount, setVisibleElementsCount] = React.useState(
     ELEMENTS_OFFSET
   );
-
-  React.useEffect(() => {
-    return UIkit.util.on('#modal-container', 'hidden', () => {
-      setSearchValue('');
-    });
-  }, []);
 
   React.useEffect(() => {
     const fetchData = async () => {

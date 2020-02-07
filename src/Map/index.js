@@ -10,7 +10,6 @@ import styles from './Map.module.css';
 import ZoomButtons from './ZoomButtons';
 import UndoButton from './UndoButton';
 import Point from './Point';
-import map from './map.jpg';
 
 const MAP_SIZE = { width: 500, height: 354 };
 
@@ -112,7 +111,7 @@ const MapComponent = ({ doc, setSelectedPointId }) => {
               style={{
                 width: `${MAP_SIZE.width}px`,
                 height: `${MAP_SIZE.height}px`,
-                backgroundImage: `url(${map})`
+                backgroundImage: `url(${doc.image})`
               }}
             >
               {doc.points.map(point => (

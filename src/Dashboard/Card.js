@@ -28,8 +28,8 @@ const Card = ({ doc }) => {
     setSelected(false);
 
     UIkit.modal
-      .prompt('Name:', doc.name, {
-        labels: { cancel: 'Отмена', ok: 'Да' },
+      .prompt('Название документа:', doc.name, {
+        labels: { cancel: 'Отмена', ok: 'Сохранить' },
         bgClose: true,
         escClose: true
       })
@@ -125,8 +125,8 @@ const Card = ({ doc }) => {
           uk-position-relative
           uk-card-media-top`}
       >
-        {doc.thumbnailSrc ? (
-          <img src={doc.thumbnailSrc} alt="map" />
+        {doc.image ? (
+          <img src={doc.image} alt="map" />
         ) : (
           <div className="uk-position-center">
             <AiOutlineFileImage size="80px" />
