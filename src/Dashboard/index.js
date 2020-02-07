@@ -30,7 +30,7 @@ const Dashboard = () => {
     const collection = getDocCollection();
     const query = collection.orderBy('lastUpdate', 'desc');
 
-    query.onSnapshot(querySnapshot => {
+    return query.onSnapshot(querySnapshot => {
       const fetchedDocuments = querySnapshot.docs.map(doc => {
         return {
           id: doc.id,
