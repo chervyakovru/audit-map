@@ -7,8 +7,34 @@ import Options from './Options';
 import styles from './Modal.module.css';
 
 const Modal = ({ doc, selectedPoint, setSelectedPointId }) => {
+  const modalRef = React.useRef(null);
+  const [searchValue, setSearchValue] = React.useState('');
+  const [shown, setShown] = React.useState(false);
+
   React.useEffect(() => {
-    return UIkit.util.on('#modal-container', 'hidden', () => {
+    if (!selectedPoint) {
+      setShown(false);
+    } else if (!shown) {
+      setShown(true);
+    }
+  }, [selectedPoint]);
+
+  React.useEffect(() => {
+    if (shown) {
+      UIkit.modal(modalRef.current).show();
+    } else {
+      UIkit.modal(modalRef.current).hide();
+    }
+  }, [shown]);
+
+  React.useEffect(() => {
+    if (selectedPoint && shown) {
+      setShown(true);
+    }
+  }, [selectedPoint]);
+
+  React.useEffect(() => {
+    return UIkit.util.on(modalRef.current, 'hidden', () => {
       setSelectedPointId(null);
     });
   }, []);
@@ -30,7 +56,12 @@ const Modal = ({ doc, selectedPoint, setSelectedPointId }) => {
   };
 
   return (
-    <div id="modal-container" className="uk-modal-container" uk-modal="true">
+    <div
+      ref={modalRef}
+      id="modal-container"
+      className="uk-modal-container"
+      uk-modal="true"
+    >
       <div className="uk-modal-dialog uk-modal-body">
         <button
           className="uk-modal-close-default"
@@ -46,7 +77,12 @@ const Modal = ({ doc, selectedPoint, setSelectedPointId }) => {
             }
             onChange={onRename}
           />
-          <Options doc={doc} selectedPoint={selectedPoint} />
+          <Options
+            doc={doc}
+            selectedPoint={selectedPoint}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
+          />
         </div>
       </div>
     </div>
