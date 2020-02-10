@@ -7,7 +7,8 @@ export const getERCollection = () => {
 
 export const getDocCollection = () => {
   const db = firebase.firestore();
-  return db.collection('documents');
+  const collection = db.collection('documents');
+  return collection;
 };
 
 export const getDocRef = id => {
