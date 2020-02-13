@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import firebase from '../firebase';
-import { getDocRef } from '../Dashboard/api';
+import { getDocRef } from '../api';
 
 const UploadFile = ({ docId, setImage }) => {
   const [isLoading, setIsLoading] = React.useState(false);

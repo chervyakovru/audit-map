@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { MdMoreHoriz } from 'react-icons/md';
 import { AiOutlineFileImage } from 'react-icons/ai';
 
-import { getDocCollection, getDocRef, getFbTimestamp } from './api';
+import { getDocumentsCollection, getDocRef, getFbTimestamp } from '../api';
 import { useOutsideClick, notificationDate } from '../utils';
 
 import styles from './Dashboard.module.css';
@@ -58,7 +58,7 @@ const Card = ({ doc }) => {
     UIkit.dropdown(dropdownRef.current).hide();
     setSelected(false);
 
-    const collection = getDocCollection();
+    const collection = getDocumentsCollection();
 
     const { id, ...docWithoutId } = doc;
     collection
@@ -89,7 +89,7 @@ const Card = ({ doc }) => {
       })
       .then(
         () => {
-          const collection = getDocCollection();
+          const collection = getDocumentsCollection();
           collection
             .doc(doc.id)
             .delete()
