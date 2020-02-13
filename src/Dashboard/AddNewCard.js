@@ -1,25 +1,20 @@
 import React from 'react';
 
 import { GoPlusSmall } from 'react-icons/go';
-import firebase from '../firebase';
+import { fbTimestamp, getDocumentsCollection } from '../api';
+
+import initialDocument from './initialDocument';
 
 import styles from './Dashboard.module.css';
 
-const initialDocument = {
-  name: 'Без названия',
-  thumbnailSrc: null,
-  points: []
-};
-
 const AddNewCard = () => {
   const createNewBoard = () => {
-    const db = firebase.firestore();
-    const collection = db.collection('documents');
+    const collection = getDocumentsCollection();
 
     collection
       .add({
         ...initialDocument,
-        lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+        lastUpdate: fbTimestamp
       })
       .then(docRef => {
         console.log('Document written with ID: ', docRef.id);
