@@ -1,16 +1,12 @@
-.addNewCard:hover {
-  background: #0f6ecd;
+.addNewCard {
   cursor: pointer;
 }
-
-.link {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.addNewCard:hover {
+  background: #0f6ecd;
 }
-
+.card {
+  cursor: pointer;
+}
 .imageContainer {
   border-bottom: 1px solid #e5e5e5;
   height: 220px;
@@ -29,7 +25,6 @@
   background-color: rgba(0, 0, 0, 0.5);
   transition: background-color 0.1s;
 }
-
 .button {
   display: none;
   color: #bfbfbf;
@@ -45,11 +40,9 @@
   color: #fff;
   text-decoration: none;
 }
-
 .dropdown {
   cursor: default;
 }
-
 .listElement {
   background: #fff;
   border: none;
