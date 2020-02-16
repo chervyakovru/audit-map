@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import Map from '../Map';
 import Modal from '../Map/Modal';
-import { getDocRef } from '../Dashboard/api';
+import { getDocRef } from '../api';
 import UploadFile from './UploadFile';
 
 const Board = () => {

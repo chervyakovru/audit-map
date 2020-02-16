@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import React from 'react';
-import { getERCollection, getDocRef } from '../../Dashboard/api';
+import { getERCollection, getDocRef } from '../../api';
 
 import Option from './Option';
 import styles from './Modal.module.css';
