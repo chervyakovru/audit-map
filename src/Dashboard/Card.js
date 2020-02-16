@@ -1,26 +1,51 @@
 import React from 'react';
 import UIkit from 'uikit';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { MdMoreHoriz } from 'react-icons/md';
 import { AiOutlineFileImage } from 'react-icons/ai';
 
-import { getDocumentsCollection, getDocRef, getFbTimestamp } from '../api';
+import {
+  getDocumentsCollection,
+  getDocRef,
+  fbTimestamp,
+  getDocFileUrl
+} from '../api';
 import { useOutsideClick, notificationDate } from '../utils';
 
 import styles from './Dashboard.module.css';
 
 const Card = ({ doc }) => {
+  const history = useHistory();
   const [selected, setSelected] = React.useState(false);
+  const [thumbnail, setThumbnail] = React.useState({
+    data: null,
+    loaded: false,
+    isExist: false
+  });
   const moreButtonRef = React.useRef();
   const dropdownRef = React.useRef();
+
+  React.useEffect(() => {
+    if (!doc.thumbnail) {
+      setThumbnail({ data: null, loaded: true, exist: false });
+      return;
+    }
+    getDocFileUrl(doc.id, doc.thumbnail)
+      .then(url => {
+        setThumbnail({ data: url, loaded: true, exist: true });
+      })
+      .catch(error => {
+        console.log('error: ', error);
+        setThumbnail({ data: null, loaded: true, exist: false });
+      });
+  }, []);
 
   useOutsideClick(moreButtonRef, () => setSelected(false));
 
   const onSelect = () => {
     setSelected(true);
   };
-
   const onRename = e => {
     e.preventDefault();
     e.stopPropagation();
@@ -33,48 +58,25 @@ const Card = ({ doc }) => {
         bgClose: true,
         escClose: true
       })
-      .then(
-        name => {
-          const documentRef = getDocRef(doc.id);
-
-          documentRef
-            .update({ name })
-            .then(() => {
-              console.log('Document successfully updated!');
-            })
-            .catch(error => {
-              console.error('Error updating document: ', error);
-            });
-        },
-        () => {
-          console.log('Canceled rename document');
-        }
-      );
+      .then(name => {
+        const documentRef = getDocRef(doc.id);
+        documentRef.update({ name });
+      });
   };
-
   const onDouble = e => {
     e.preventDefault();
     e.stopPropagation();
     UIkit.dropdown(dropdownRef.current).hide();
     setSelected(false);
 
-    const collection = getDocumentsCollection();
-
     const { id, ...docWithoutId } = doc;
-    collection
-      .add({
-        ...docWithoutId,
-        name: `${doc.name} (Копия)`,
-        lastUpdate: getFbTimestamp()
-      })
-      .then(docRef => {
-        console.log('Document written with ID: ', docRef.id);
-      })
-      .catch(error => {
-        console.error('Error adding document: ', error);
-      });
+    const collection = getDocumentsCollection();
+    collection.add({
+      ...docWithoutId,
+      name: `${doc.name} (Копия)`,
+      lastUpdate: fbTimestamp
+    });
   };
-
   const onDelete = e => {
     e.preventDefault();
     e.stopPropagation();
@@ -87,23 +89,13 @@ const Card = ({ doc }) => {
         bgClose: true,
         escClose: true
       })
-      .then(
-        () => {
-          const collection = getDocumentsCollection();
-          collection
-            .doc(doc.id)
-            .delete()
-            .then(() => {
-              console.log('Document successfully deleted!');
-            })
-            .catch(error => {
-              console.error('Error adding document: ', error);
-            });
-        },
-        () => {
-          console.log('Canceled delete document');
-        }
-      );
+      .then(() => {
+        const collection = getDocumentsCollection();
+        collection.doc(doc.id).delete();
+      });
+  };
+  const goTo = () => {
+    history.push(`/board/${doc.id}`);
   };
 
   const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();
@@ -111,6 +103,7 @@ const Card = ({ doc }) => {
   return (
     <div
       className={`
+        ${styles.card}
         uk-card
         uk-card-default
         uk-card-small
@@ -118,6 +111,10 @@ const Card = ({ doc }) => {
         uk-position-relative`}
       onMouseEnter={() => setSelected(true)}
       onMouseLeave={() => setSelected(false)}
+      onClick={goTo}
+      role="button"
+      tabIndex={0}
+      onKeyPress={() => {}}
     >
       <div
         className={`
@@ -125,8 +122,8 @@ const Card = ({ doc }) => {
           uk-position-relative
           uk-card-media-top`}
       >
-        {doc.image ? (
-          <img src={doc.image} alt="map" />
+        {thumbnail.loaded && thumbnail.data ? (
+          <img src={thumbnail.data} alt="Map thumbnail" />
         ) : (
           <div className="uk-position-center">
             <AiOutlineFileImage size="80px" />
@@ -140,10 +137,6 @@ const Card = ({ doc }) => {
           {selected && `Изменено ${notificationDate(lastUpdateDate)}`}
         </small>
       </div>
-      <Link
-        to={`/board/${doc.id}`}
-        className={`${styles.link} uk-link-reset`}
-      />
       <button
         ref={moreButtonRef}
         type="button"
