@@ -4,17 +4,18 @@ import Header from './Header';
 import Card from './Card';
 import AddNewCard from './AddNewCard';
 
-import { getDocCollection } from './api';
+import { getDocumentsCollection } from '../api';
 
 const Dashboard = () => {
   const [documents, setDocuments] = React.useState([]);
+  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const collection = getDocCollection();
+      const collection = getDocumentsCollection();
       const query = collection.orderBy('lastUpdate', 'desc');
-
       const response = await query.get();
+
       const fetchedDocuments = response.docs.map(doc => {
         return {
           id: doc.id,
@@ -22,12 +23,13 @@ const Dashboard = () => {
         };
       });
       setDocuments(fetchedDocuments);
+      setLoaded(true);
     };
     fetchData();
   }, []);
 
   React.useEffect(() => {
-    const collection = getDocCollection();
+    const collection = getDocumentsCollection();
     const query = collection.orderBy('lastUpdate', 'desc');
 
     return query.onSnapshot(querySnapshot => {
@@ -60,13 +62,21 @@ const Dashboard = () => {
             <div>
               <AddNewCard />
             </div>
-            {documents.map(doc => {
-              return (
-                <div key={doc.id}>
-                  <Card doc={doc} />
+            {loaded ? (
+              documents.map(doc => {
+                return (
+                  <div key={doc.id}>
+                    <Card doc={doc} />
+                  </div>
+                );
+              })
+            ) : (
+              <div className="uk-card uk-height-medium">
+                <div className="uk-position-center uk-text-center">
+                  <div uk-spinner="ratio: 2" />
                 </div>
-              );
-            })}
+              </div>
+            )}
           </div>
         </div>
       </div>

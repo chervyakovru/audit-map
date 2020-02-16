@@ -1,6 +1,6 @@
 import React from 'react';
 import UIkit from 'uikit';
-import { getDocRef } from '../../Dashboard/api';
+import { getDocRef } from '../../api';
 
 import Options from './Options';
 
