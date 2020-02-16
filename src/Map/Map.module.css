@@ -7,17 +7,16 @@
 }
 
 .dot {
-  width: 12px;
-  height: 13px;
+  width: 30px;
+  height: 31px;
   cursor: pointer;
-  transform: translateX(-6px) translateY(-13px);
   padding-bottom: 1px;
 }
 .dot .circle {
   box-sizing: border-box;
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
-  width: 12px;
-  height: 12px;
+  width: 30px;
+  height: 30px;
   border: 1px solid #fff;
   border-radius: 50%;
   background-color: #1e87f0;
@@ -53,19 +52,4 @@
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
-}
-
-.button {
-  display: block;
-  color: #000;
-  text-decoration: none;
-  user-select: none;
-}
-.button:focus {
-  color: #000;
-  text-decoration: none;
-}
-.button:not(:disabled):hover {
-  color: #1e87f0;
-  text-decoration: none;
 }

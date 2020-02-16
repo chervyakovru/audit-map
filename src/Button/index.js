@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Map.module.css';
+import styles from './Button.module.css';
 
 const Button = props => {
   const { onClick, tooltip, disabled, children } = props;
