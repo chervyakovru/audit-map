@@ -1,29 +1,39 @@
 import firebase from './firebase';
 
+export const fbTimestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+const getFirestore = () => {
+  return firebase.firestore();
+};
+
+const getStorage = () => {
+  return firebase.storage();
+};
+
 export const getERCollection = () => {
-  const db = firebase.firestore();
-  return db.collection('expertReport');
+  return getFirestore().collection('expertReport');
 };
 
 export const getDocumentsCollection = () => {
-  const db = firebase.firestore();
-  const collection = db.collection('documents');
-  return collection;
+  return getFirestore().collection('documents');
 };
 
 export const getDocRef = id => {
-  const collection = getDocumentsCollection();
-  return collection.doc(id);
+  return getDocumentsCollection().doc(id);
 };
 
-export const fbTimestamp = firebase.firestore.FieldValue.serverTimestamp();
-
-export const getDocImage = async id => {
-  const storage = firebase.storage();
-  const imgRef = await storage.ref(`${id}/images/map.jpg`).getDownloadURL();
-  console.log('imgRef: ', imgRef);
-  return imgRef;
+export const getPointsCollection = docId => {
+  return getDocRef(docId).collection('points');
 };
 
-export const getFbTimestamp = () =>
-  firebase.firestore.FieldValue.serverTimestamp();
+export const getPointRef = (docId, pointId) => {
+  return getPointsCollection(docId).doc(pointId);
+};
+
+export const getDocFileRef = (id, fileName) => {
+  return getStorage().ref(`${id}/images/${fileName}`);
+};
+
+export const getDocFileUrl = (id, fileName) => {
+  return getDocFileRef(id, fileName).getDownloadURL();
+};
