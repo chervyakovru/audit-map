@@ -1,13 +1,51 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap&subset=cyrillic');
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  overflow: hidden;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.react-transform-component.react-transform-component {
+  width: 100%;
+  height: 100%;
+}
+
+.main {
+  height: 100%;
+  background-color: #f8f8f8;
+}
+
+.uk-modal {
+  z-index: 1040;
+}
+
+@media only screen and (max-width: 576px) {
+  .uk-modal {
+    padding: 0;
+  }
+  .uk-modal-body {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  [class*='uk-modal-close-'] {
+    top: 0;
+    right: 0;
+    padding: 16px;
+  }
 }

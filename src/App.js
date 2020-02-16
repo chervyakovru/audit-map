@@ -1,26 +1,47 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import StoreContext from 'storeon/react/context';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from 'react-router-dom';
+import store from './store';
 
-function App() {
+import Board from './Board';
+import Dashboard from './Dashboard';
+
+const PublicHomePage = () => {
+  return null;
+};
+
+const App = () => {
+  const loggedIn = true;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          {loggedIn ? <Redirect to="/dashboard" /> : <PublicHomePage />}
+        </Route>
+        <Route path="/dashboard">
+          <Dashboard />
+        </Route>
+        <Route path="/board/:docId">
+          <Board />
+        </Route>
+        <Route path="*">
+          <h1>404</h1>
+        </Route>
+      </Switch>
+    </Router>
+  );
+};
+
+export default function() {
+  return (
+    <StoreContext.Provider value={store}>
+      <App />
+    </StoreContext.Provider>
   );
 }
-
-export default App;
