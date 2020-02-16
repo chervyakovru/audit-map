@@ -43,7 +43,10 @@ const Card = ({ doc }) => {
 
   useOutsideClick(moreButtonRef, () => setSelected(false));
 
-  const onSelect = () => {
+  const onSelect = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
     setSelected(true);
   };
   const onRename = e => {
