@@ -1,89 +1,89 @@
 import React from 'react';
-import UIkit from 'uikit';
-import { getDocRef } from '../../api';
+import { useHistory } from 'react-router-dom';
+import { getPointRef } from '../../api';
+import { useOutsideClick, useKeyUp } from '../../utils';
 
 import Options from './Options';
-
 import styles from './Modal.module.css';
 
-const Modal = ({ doc, selectedPoint, setSelectedPointId }) => {
-  const modalRef = React.useRef(null);
-  const [searchValue, setSearchValue] = React.useState('');
-  const [shown, setShown] = React.useState(false);
+const Modal = ({ docId, pointId }) => {
+  const history = useHistory();
+  const [point, setPoint] = React.useState({ data: null, loaded: false });
+  const content = React.useRef(null);
 
   React.useEffect(() => {
-    if (!selectedPoint) {
-      setShown(false);
-    } else if (!shown) {
-      setShown(true);
-    }
-  }, [selectedPoint]);
-
-  React.useEffect(() => {
-    if (shown) {
-      UIkit.modal(modalRef.current).show();
-    } else {
-      UIkit.modal(modalRef.current).hide();
-    }
-  }, [shown]);
-
-  React.useEffect(() => {
-    if (selectedPoint && shown) {
-      setShown(true);
-    }
-  }, [selectedPoint]);
-
-  React.useEffect(() => {
-    return UIkit.util.on(modalRef.current, 'hidden', () => {
-      setSelectedPointId(null);
+    return getPointRef(docId, pointId).onSnapshot(snapshot => {
+      const fetchedPoint = {
+        ...snapshot.data(),
+        id: snapshot.id
+      };
+      setPoint({ data: fetchedPoint, loaded: true });
     });
-  }, []);
+  }, [pointId]);
 
   const onRename = e => {
     const name = e.target.value;
-    const documentRef = getDocRef(doc.id);
-    const { points } = doc;
-    const newPoints = points.map(point => {
-      if (point.id !== selectedPoint.id) return point;
-      return {
-        ...point,
-        name
-      };
-    });
-    documentRef.update({
-      points: newPoints
-    });
+    const pointRef = getPointRef(docId, point.data.id);
+    pointRef.update({ name });
   };
+
+  const closeModal = () => {
+    history.goBack();
+  };
+
+  useOutsideClick(content, closeModal);
+
+  const onKeyPress = e => {
+    if (e.code === 'Escape') {
+      closeModal();
+    }
+  };
+
+  useKeyUp(onKeyPress);
 
   return (
     <div
-      ref={modalRef}
-      id="modal-container"
-      className="uk-modal-container"
-      uk-modal="true"
+      style={{ background: 'rgba(0,0,0,.3)' }}
+      className="
+        uk-position-fixed
+        uk-position-cover
+        uk-position-z-index
+        uk-padding"
     >
-      <div className="uk-modal-dialog uk-modal-body">
+      <div
+        ref={content}
+        className="
+          uk-card
+          uk-card-body
+          uk-card-default
+          uk-container
+          uk-container-large
+          uk-height-1-1
+          uk-flex
+          uk-flex-column
+          uk-overflow-hidden"
+      >
         <button
-          className="uk-modal-close-default"
+          onClick={closeModal}
           type="button"
           uk-close="true"
+          className="uk-padding-small uk-position-top-right"
         />
-        <div className="uk-flex uk-flex-column">
-          <input
-            className={`${styles.title} uk-h4`}
-            type="text"
-            value={
-              selectedPoint && selectedPoint.name ? selectedPoint.name : ''
-            }
-            onChange={onRename}
-          />
-          <Options
-            doc={doc}
-            selectedPoint={selectedPoint}
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-          />
-        </div>
+        {!point.loaded ? (
+          <div className="uk-position-center">
+            <div uk-spinner="ratio: 2" />
+          </div>
+        ) : (
+          <>
+            <input
+              className={`${styles.title} uk-h4 uk-margin-remove-top`}
+              type="text"
+              value={point.data.name}
+              onChange={onRename}
+            />
+            <Options docId={docId} point={point.data} />
+          </>
+        )}
       </div>
     </div>
   );

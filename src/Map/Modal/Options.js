@@ -1,14 +1,13 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 import React from 'react';
-import { getERCollection, getDocRef } from '../../api';
+import { getPointRef, getERCollection } from '../../api';
 
 import Option from './Option';
 import styles from './Modal.module.css';
 
 const ELEMENTS_OFFSET = 20;
 
-const Options = ({ selectedPoint, doc, searchValue, setSearchValue }) => {
+const Options = ({ docId, point }) => {
+  const [searchValue, setSearchValue] = React.useState('');
   const [violations, setViolations] = React.useState(null);
   const [visibleViolations, setVisibleViolations] = React.useState(null);
   const [visibleElementsCount, setVisibleElementsCount] = React.useState(
@@ -31,54 +30,35 @@ const Options = ({ selectedPoint, doc, searchValue, setSearchValue }) => {
     fetchData();
   }, []);
 
-  const removeViolationId = (points, violationId) => {
-    return points.map(point => {
-      if (point.id !== selectedPoint.id) return point;
-      return {
-        ...point,
-        violationsId: selectedPoint.violationsId.filter(
-          id => id !== violationId
-        )
-      };
+  const removeViolationId = violationId => {
+    const pointRef = getPointRef(docId, point.id);
+    const newViolationsId = point.violationsId.filter(id => id !== violationId);
+    pointRef.update({
+      violationsId: newViolationsId
     });
   };
 
-  const addViolationId = (points, violationId) => {
-    return points.map(point => {
-      if (point.id !== selectedPoint.id) return point;
-      return {
-        ...point,
-        violationsId: [...selectedPoint.violationsId, violationId]
-      };
+  const addViolationId = violationId => {
+    const pointRef = getPointRef(docId, point.id);
+    const newViolationsId = [...point.violationsId, violationId];
+    pointRef.update({
+      violationsId: newViolationsId
     });
   };
 
   const onSelectOption = async e => {
     const { target } = e;
-    const value = target.checked;
-    const violationId = target.name;
-    const { points } = doc;
+    const { checked, name: violationId } = target;
 
-    let newPoints = points;
-    const isContain = selectedPoint.violationsId.find(id => id === violationId);
+    const isContain = point.violationsId.find(id => id === violationId);
 
-    if (!value) {
+    if (!checked) {
       if (!isContain) return;
-      newPoints = removeViolationId(points, violationId);
+      removeViolationId(violationId);
     } else {
       if (isContain) return;
-      newPoints = addViolationId(points, violationId);
+      addViolationId(violationId);
     }
-
-    const docRef = getDocRef(doc.id);
-    docRef.update({
-      points: newPoints
-    });
-  };
-
-  const isChecked = optionId => {
-    if (!selectedPoint || !selectedPoint.violationsId) return false;
-    return selectedPoint.violationsId.includes(optionId.toString());
   };
 
   const updateVisibleViolations = value => {
@@ -120,14 +100,17 @@ const Options = ({ selectedPoint, doc, searchValue, setSearchValue }) => {
   }, [searchValue]);
 
   const onChange = e => {
-    const { value } = e.target;
-    setSearchValue(value);
+    setSearchValue(e.target.value);
+  };
+
+  const isChecked = optionId => {
+    return point.violationsId.includes(optionId.toString());
   };
 
   const getText = (text, foundIndexes, searchLength) => {
-    if (searchLength === 0 || !foundIndexes || foundIndexes.length === 0)
-      return <span>{text}</span>;
-
+    if (searchLength === 0 || !foundIndexes || foundIndexes.length === 0) {
+      return text;
+    }
     const output = [text.slice(0, foundIndexes[0])];
 
     for (let i = 0; i < foundIndexes.length; i += 1) {
@@ -171,7 +154,6 @@ const Options = ({ selectedPoint, doc, searchValue, setSearchValue }) => {
         />
         {searchValue.length !== 0 && (
           <button
-            id="clear-search"
             type="button"
             className="uk-position-center-right uk-padding-small"
             uk-close="true"
@@ -179,8 +161,16 @@ const Options = ({ selectedPoint, doc, searchValue, setSearchValue }) => {
           />
         )}
       </form>
-      <div uk-overflow-auto="true" onScroll={onScroll}>
-        {!visibleViolations && <div uk-spinner="true" />}
+      <div
+        className="uk-flex uk-flex-column"
+        uk-overflow-auto="true"
+        onScroll={onScroll}
+      >
+        {!visibleViolations && (
+          <div className="uk-position-center">
+            <div uk-spinner="ratio: 2" />
+          </div>
+        )}
         {visibleViolations &&
           (visibleViolations.length === 0 ? (
             <p>Нет совпадений</p>
