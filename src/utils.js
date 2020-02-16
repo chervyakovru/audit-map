@@ -19,6 +19,16 @@ export const useOutsideClick = (ref, callback) => {
   });
 };
 
+export const useKeyUp = callback => {
+  useEffect(() => {
+    document.addEventListener('keyup', callback);
+
+    return () => {
+      document.removeEventListener('keyup', callback);
+    };
+  });
+};
+
 const shortMonthNames = [
   'Янв',
   'Фев',
