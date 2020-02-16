@@ -27,8 +27,11 @@ const App = () => {
         <Route path="/dashboard">
           <Dashboard />
         </Route>
-        <Route path="/board/:id">
+        <Route path="/board/:docId">
           <Board />
+        </Route>
+        <Route path="*">
+          <h1>404</h1>
         </Route>
       </Switch>
     </Router>
