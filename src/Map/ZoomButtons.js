@@ -6,7 +6,7 @@ import {
   MdFullscreenExit
 } from 'react-icons/md';
 
-import Button from './Button';
+import Button from '../Button';
 
 const ZoomButtons = props => {
   const [fullscreen, setFullscreen] = React.useState(false);
