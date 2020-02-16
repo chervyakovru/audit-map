@@ -3,25 +3,15 @@ import React from 'react';
 import { GoPlusSmall } from 'react-icons/go';
 import { fbTimestamp, getDocumentsCollection } from '../api';
 
-import initialDocument from './initialDocument';
-
 import styles from './Dashboard.module.css';
 
 const AddNewCard = () => {
   const createNewBoard = () => {
     const collection = getDocumentsCollection();
-
-    collection
-      .add({
-        ...initialDocument,
-        lastUpdate: fbTimestamp
-      })
-      .then(docRef => {
-        console.log('Document written with ID: ', docRef.id);
-      })
-      .catch(error => {
-        console.error('Error adding document: ', error);
-      });
+    collection.add({
+      name: 'Новый документ',
+      lastUpdate: fbTimestamp
+    });
   };
 
   return (
@@ -30,7 +20,8 @@ const AddNewCard = () => {
       onClick={createNewBoard}
       onKeyPress={() => {}}
       tabIndex={0}
-      className={`${styles.addNewCard}
+      className={`
+        ${styles.addNewCard}
         uk-card
         uk-card-primary
         uk-card-small
