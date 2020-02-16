@@ -7,26 +7,7 @@ import AddNewCard from './AddNewCard';
 import { getDocumentsCollection } from '../api';
 
 const Dashboard = () => {
-  const [documents, setDocuments] = React.useState([]);
-  const [loaded, setLoaded] = React.useState(false);
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const collection = getDocumentsCollection();
-      const query = collection.orderBy('lastUpdate', 'desc');
-      const response = await query.get();
-
-      const fetchedDocuments = response.docs.map(doc => {
-        return {
-          id: doc.id,
-          ...doc.data()
-        };
-      });
-      setDocuments(fetchedDocuments);
-      setLoaded(true);
-    };
-    fetchData();
-  }, []);
+  const [documents, setDocuments] = React.useState({ data: [], loaded: false });
 
   React.useEffect(() => {
     const collection = getDocumentsCollection();
@@ -39,7 +20,7 @@ const Dashboard = () => {
           ...doc.data()
         };
       });
-      setDocuments(fetchedDocuments);
+      setDocuments({ data: fetchedDocuments, loaded: true });
     });
   }, []);
 
@@ -62,8 +43,8 @@ const Dashboard = () => {
             <div>
               <AddNewCard />
             </div>
-            {loaded ? (
-              documents.map(doc => {
+            {documents.loaded ? (
+              documents.data.map(doc => {
                 return (
                   <div key={doc.id}>
                     <Card doc={doc} />
@@ -84,6 +65,4 @@ const Dashboard = () => {
   );
 };
 
-export default function() {
-  return <Dashboard />;
-}
+export default Dashboard;

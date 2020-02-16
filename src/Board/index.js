@@ -1,66 +1,128 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
+
+import { MdHome } from 'react-icons/md';
+import { getDocRef, getDocFileUrl, getPointsCollection } from '../api';
 
 import Map from '../Map';
-import Modal from '../Map/Modal';
-import { getDocRef } from '../api';
 import UploadFile from './UploadFile';
+import Button from '../Button';
+import BoardPanel from '../BoardPanel';
 
-const Board = () => {
-  const [doc, setDocument] = React.useState(null);
-  const [selectedPointId, setSelectedPointId] = React.useState(null);
-  const { id } = useParams();
-
-  React.useEffect(() => {
-    const fetchDocument = async () => {
-      const docRef = await getDocRef(id).get();
-
-      const fetchedDocument = {
-        ...docRef.data(),
-        id: docRef.id
-      };
-      setDocument(fetchedDocument);
+const getImageSize = (w, h) => {
+  const { clientWidth, clientHeight } = document.documentElement;
+  if (w < clientWidth && h < clientHeight) {
+    return {
+      width: w,
+      height: h
     };
-    fetchDocument();
-  }, []);
+  }
+  if (clientWidth < clientHeight) {
+    const ratio = h / w;
+    return {
+      width: clientWidth * 0.9,
+      height: clientWidth * 0.9 * ratio
+    };
+  }
+  const ratio = w / h;
+  return {
+    width: clientHeight * 0.9 * ratio,
+    height: clientHeight * 0.9
+  };
+};
+
+const MapComponent = () => {
+  const history = useHistory();
+  const { docId } = useParams();
+  const [doc, setDoc] = React.useState({ data: {}, loaded: false });
+  const [points, setPoints] = React.useState({ data: [], loaded: false });
+  const [image, setImage] = React.useState({
+    data: {
+      src: '',
+      width: 0,
+      height: 0
+    },
+    loaded: false,
+    exists: false
+  });
 
   React.useEffect(() => {
-    const docRef = getDocRef(id);
-    return docRef.onSnapshot(snapshot => {
+    return getDocRef(docId).onSnapshot(snapshot => {
       const fetchedDocument = {
         ...snapshot.data(),
         id: snapshot.id
       };
-      setDocument(fetchedDocument);
+      setDoc({ data: fetchedDocument, loaded: true });
     });
   }, []);
 
-  if (!doc) {
+  React.useEffect(() => {
+    if (!doc.loaded) return;
+    if (!doc.data.mapName) {
+      setImage({
+        ...image,
+        loaded: true,
+        exists: false
+      });
+    } else {
+      getDocFileUrl(docId, doc.data.mapName).then(url => {
+        const tmpImg = new Image();
+        tmpImg.addEventListener('load', () => {
+          const imageSize = getImageSize(tmpImg.width, tmpImg.height);
+          setImage({
+            data: {
+              src: url,
+              ...imageSize
+            },
+            loaded: true,
+            exists: true
+          });
+        });
+        tmpImg.src = url;
+      });
+    }
+  }, [doc]);
+
+  React.useEffect(() => {
+    getPointsCollection(docId)
+      .get()
+      .then(querySnapshot => {
+        const fetchedPoints = querySnapshot.docs.map(point => ({
+          id: point.id,
+          ...point.data()
+        }));
+        setPoints({ data: fetchedPoints, loaded: true });
+      });
+  }, []);
+
+  if (!doc.loaded || !image.loaded || !points.loaded) {
     return (
       <div className="main">
-        <div className="uk-position-center">
-          <div uk-spinner="ratio: 3" />
+        <div className="uk-position-center uk-text-center">
+          <div uk-spinner="ratio: 2" />
         </div>
       </div>
     );
   }
 
-  if (!doc.image) {
-    return <UploadFile docId={doc.id} />;
-  }
-
-  const selectedPoint = doc.points.find(point => point.id === selectedPointId);
-
   return (
-    <div className="main">
-      <Map doc={doc} setSelectedPointId={setSelectedPointId} />
-      <Modal
-        doc={doc}
-        selectedPoint={selectedPoint}
-        setSelectedPointId={setSelectedPointId}
-      />
-    </div>
+    <>
+      <BoardPanel title={doc.name}>
+        <Button onClick={() => history.push('/dashboard')} tooltip="На главную">
+          <MdHome size="25px" />
+        </Button>
+      </BoardPanel>
+      {!image.exists ? (
+        <UploadFile />
+      ) : (
+        <Map
+          defaultDocument={doc.data}
+          defaultPoints={points.data}
+          image={image.data}
+        />
+      )}
+    </>
   );
 };
 
-export default Board;
+export default MapComponent;

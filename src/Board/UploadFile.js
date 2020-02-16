@@ -1,39 +1,36 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
-import firebase from '../firebase';
-import { getDocRef } from '../api';
+import { useParams } from 'react-router-dom';
 
-const UploadFile = ({ docId, setImage }) => {
-  const [isLoading, setIsLoading] = React.useState(false);
+import { getDocFileRef, getDocRef } from '../api';
+
+const UploadFile = () => {
+  const { docId } = useParams();
+  const [loading, setIsLoading] = React.useState(false);
 
   const uploadFileToFB = file => {
-    return new Promise((resolve, reject) => {
-      const storage = firebase.storage();
-      const storageRef = storage.ref();
-      const mapRef = storageRef.child(`${docId}/images/map.jpg`);
+    const mapRef = getDocFileRef(docId, file.name);
+    const uploadTask = mapRef.put(file);
 
-      const uploadTask = mapRef.put(file);
-
-      uploadTask.on(
-        'state_changed',
-        snapshot => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log('Handle newProgress update. progress: ', progress);
-        },
-        error => {
-          console.log('Handle unsuccessful uploads. error: ', error);
-          reject(error);
-        },
-        () => {
-          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-            console.log('File available at', downloadURL);
-            resolve(downloadURL);
-          });
-        }
-      );
-    });
+    uploadTask.on(
+      'state_changed',
+      snapshot => {
+        const { bytesTransferred, totalBytes } = snapshot;
+        const progress = (bytesTransferred / totalBytes) * 100;
+        console.log('Handle newProgress update. progress: ', progress);
+      },
+      error => {
+        console.log('Handle unsuccessful uploads. error: ', error);
+        setIsLoading(false);
+      },
+      () => {
+        const documentRef = getDocRef(docId);
+        documentRef.update({
+          mapName: uploadTask.snapshot.ref.name
+        });
+      }
+    );
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -43,41 +40,37 @@ const UploadFile = ({ docId, setImage }) => {
     onDropAccepted: async acceptedFiles => {
       setIsLoading(true);
       const file = acceptedFiles[0];
-      try {
-        const url = await uploadFileToFB(file);
-        const docRef = getDocRef(docId);
-        docRef.update({
-          image: url
-        });
-        setImage(url);
-      } catch (error) {
-        setIsLoading(false);
-      }
+      uploadFileToFB(file);
     },
     onDropRejected: () => console.log('onDropRejected'),
     preventDropOnDocument: false
   });
 
-  if (isLoading) {
-    return (
-      <div className="main">
-        <div className="uk-position-center">
-          <div uk-spinner="ratio: 3" />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="main">
       <div {...getRootProps({ className: 'uk-width-1-1 uk-height-1-1' })}>
         <input {...getInputProps()} />
-        <div className="k-placeholder uk-text-center uk-position-center">
-          <span uk-icon="icon: cloud-upload" />{' '}
-          <span className="uk-text-middle">
-            Перетащите файл в окно браузера или нажмите в любом месте
-          </span>
-        </div>
+        {loading ? (
+          <div className="uk-position-center">
+            <div uk-spinner="ratio: 2" />
+          </div>
+        ) : (
+          <div
+            className="
+            uk-placeholder
+            uk-text-center
+            uk-position-center
+            uk-padding"
+          >
+            <span
+              className="uk-margin-small-right"
+              uk-icon="icon: cloud-upload"
+            />
+            <span className="uk-text-middle">
+              Перетащите файл в окно браузера или нажмите в любом месте
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
