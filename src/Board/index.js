@@ -2,7 +2,15 @@ import React from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 
 import { MdHome } from 'react-icons/md';
-import { getDocRef, getDocFileUrl, getPointsCollection } from '../api';
+import { AiOutlineDownload } from 'react-icons/ai';
+
+import {
+  getDocRef,
+  getDocFileUrl,
+  getPointsCollection,
+  getThemesCollection,
+  getERCollection
+} from '../api';
 
 import Map from '../Map';
 import UploadFile from './UploadFile';
@@ -45,6 +53,14 @@ const MapComponent = () => {
     loaded: false,
     exists: false
   });
+  const formRef = React.useRef(null);
+  const [requestValue, setRequestValue] = React.useState('');
+
+  React.useEffect(() => {
+    if (requestValue.length !== 0) {
+      formRef.current.submit();
+    }
+  }, [requestValue]);
 
   React.useEffect(() => {
     return getDocRef(docId).onSnapshot(snapshot => {
@@ -95,6 +111,46 @@ const MapComponent = () => {
       });
   }, []);
 
+  const downloadDocument = () => {
+    const pointsRequest = getPointsCollection(docId).get();
+    const documentRequest = getDocRef(docId).get();
+    const themesRequest = getThemesCollection().get();
+    const violationsRequest = getERCollection().get();
+
+    Promise.all([
+      documentRequest,
+      pointsRequest,
+      themesRequest,
+      violationsRequest
+    ]).then(response => {
+      const fetchedPoints = response[1].docs.map(point => point.data());
+      const fetchedThemes = response[2].docs.reduce((acc, theme) => {
+        const data = theme.data();
+        return { ...acc, [data.id]: data.text };
+      }, {});
+      const fetchedViolations = response[3].docs.map(violation =>
+        violation.data()
+      );
+
+      const request = {};
+
+      fetchedPoints.forEach(point => {
+        const violations = point.violationsId;
+        violations.forEach(violationId => {
+          const violation = fetchedViolations[violationId];
+          const theme = fetchedThemes[violation.theme_id];
+          if (!(theme in request)) {
+            request[theme] = [];
+          }
+          const text = `${violation.text} (${point.name})`;
+          request[theme].push({ text });
+        });
+      });
+
+      setRequestValue(JSON.stringify(request));
+    });
+  };
+
   if (!doc.loaded || !image.loaded || !points.loaded) {
     return (
       <div className="main">
@@ -107,9 +163,19 @@ const MapComponent = () => {
 
   return (
     <>
-      <BoardPanel title={doc.name}>
+      <BoardPanel title={doc.data.name}>
         <Button onClick={() => history.push('/dashboard')} tooltip="На главную">
           <MdHome size="25px" />
+        </Button>
+        <Button onClick={downloadDocument} tooltip="Скачать документ">
+          <form
+            method="POST"
+            action="/projects/audit/api/word/createDocument.php"
+            ref={formRef}
+          >
+            <input type="hidden" name="violations" value={requestValue} />
+          </form>
+          <AiOutlineDownload size="25px" />
         </Button>
       </BoardPanel>
       {!image.exists ? (

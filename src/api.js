@@ -10,6 +10,10 @@ const getStorage = () => {
   return firebase.storage();
 };
 
+export const getThemesCollection = () => {
+  return getFirestore().collection('themes');
+};
+
 export const getERCollection = () => {
   return getFirestore().collection('expertReport');
 };
