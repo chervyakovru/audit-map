@@ -28,7 +28,7 @@ const Point = ({ scale, point }) => {
       uk-tooltip={point.name ? `title: ${point.name}; delay: 500` : ''}
     >
       <span className={styles.circle}>
-        <span className={styles.title}>{point.name}</span>
+        <span className={styles.title}>{point.name.trim().substr(0, 2)}</span>
       </span>
     </div>
   );
