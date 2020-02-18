@@ -19,7 +19,7 @@ const App = () => {
   const loggedIn = true;
 
   return (
-    <Router>
+    <Router basename="/projects/audit">
       <Switch>
         <Route exact path="/">
           {loggedIn ? <Redirect to="/dashboard" /> : <PublicHomePage />}
