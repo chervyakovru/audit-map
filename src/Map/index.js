@@ -117,7 +117,12 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
                 }}
               >
                 {points.map(point => (
-                  <Point scale={scale} key={point.id} point={point} />
+                  <Point
+                    key={point.id}
+                    docId={docId}
+                    scale={scale}
+                    point={point}
+                  />
                 ))}
               </div>
             </TransformComponent>
