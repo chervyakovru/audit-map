@@ -10,13 +10,10 @@ import store from './store';
 
 import Board from './Board';
 import Dashboard from './Dashboard';
-
-const PublicHomePage = () => {
-  return null;
-};
+import PublicHomePage from './PublicHomePage';
 
 const App = () => {
-  const loggedIn = true;
+  const loggedIn = false;
 
   return (
     <Router basename="/projects/audit">
