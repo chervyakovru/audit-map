@@ -1,44 +1,28 @@
 import React from 'react';
-import StoreContext from 'storeon/react/context';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect
-} from 'react-router-dom';
-import store from './store';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { AuthProvider } from './Auth';
+import PrivateRoute from './Auth/PrivateRoute';
 
-import Board from './Board';
+import Login from './Login';
+import SignUp from './SignUp';
+
 import Dashboard from './Dashboard';
-import PublicHomePage from './PublicHomePage';
 
 const App = () => {
-  const loggedIn = false;
-
   return (
-    <Router basename="/projects/audit">
-      <Switch>
-        <Route exact path="/">
-          {loggedIn ? <Redirect to="/dashboard" /> : <PublicHomePage />}
-        </Route>
-        <Route path="/dashboard">
-          <Dashboard />
-        </Route>
-        <Route path="/board/:docId">
-          <Board />
-        </Route>
-        <Route path="*">
-          <h1>404</h1>
-        </Route>
-      </Switch>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Switch>
+          <PrivateRoute exact path="/" component={Dashboard} />
+          <Route path="/login" component={Login} />
+          <Route path="/signup" component={SignUp} />
+          <Route path="*">
+            <h1>404</h1>
+          </Route>
+        </Switch>
+      </Router>
+    </AuthProvider>
   );
 };
 
-export default function() {
-  return (
-    <StoreContext.Provider value={store}>
-      <App />
-    </StoreContext.Provider>
-  );
-}
+export default App;
