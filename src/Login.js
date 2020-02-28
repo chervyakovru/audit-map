@@ -1,7 +1,8 @@
 import React from 'react';
 import { withRouter, Redirect } from 'react-router-dom';
+import useStoreon from 'storeon/react';
+
 import firebase from './firebase';
-import { AuthContext } from './Auth';
 
 const Login = ({ history }) => {
   const handleLogin = React.useCallback(
@@ -20,9 +21,9 @@ const Login = ({ history }) => {
     [history]
   );
 
-  const { currentUser } = React.useContext(AuthContext);
+  const { userId } = useStoreon('userId');
 
-  if (currentUser) {
+  if (userId) {
     return <Redirect to="/" />;
   }
 

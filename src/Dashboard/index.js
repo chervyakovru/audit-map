@@ -1,17 +1,17 @@
 import React from 'react';
+import useStoreon from 'storeon/react';
+import { fbTimestamp, getBoardsCollection } from '../api';
 
 import Header from './Header';
 import Card from './Card';
 import AddNewCard from './AddNewCard';
 
-import { getDocumentsCollection } from '../api';
-
 const Dashboard = () => {
   const [documents, setDocuments] = React.useState({ data: [], loaded: false });
+  const { user } = useStoreon('user');
 
   React.useEffect(() => {
-    const collection = getDocumentsCollection();
-    const query = collection.orderBy('lastUpdate', 'desc');
+    const query = getBoardsCollection(user.uid).orderBy('lastUpdate', 'desc');
 
     return query.onSnapshot(querySnapshot => {
       const fetchedDocuments = querySnapshot.docs.map(doc => {
@@ -23,6 +23,13 @@ const Dashboard = () => {
       setDocuments({ data: fetchedDocuments, loaded: true });
     });
   }, []);
+
+  const createNewBoard = () => {
+    getBoardsCollection(user.uid).add({
+      name: 'Новый документ',
+      lastUpdate: fbTimestamp
+    });
+  };
 
   return (
     <>
@@ -41,7 +48,7 @@ const Dashboard = () => {
             uk-grid="true"
           >
             <div>
-              <AddNewCard />
+              <AddNewCard createNewBoard={createNewBoard} />
             </div>
             {documents.loaded ? (
               documents.data.map(doc => {
