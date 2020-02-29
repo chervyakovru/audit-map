@@ -21,9 +21,9 @@ const Login = ({ history }) => {
     [history]
   );
 
-  const { userId } = useStoreon('userId');
+  const { user } = useStoreon('user');
 
-  if (userId) {
+  if (user) {
     return <Redirect to="/" />;
   }
 

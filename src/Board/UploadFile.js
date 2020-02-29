@@ -2,15 +2,18 @@
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
+import useStoreon from 'storeon/react';
 
-import { getDocFileRef, getDocRef } from '../api';
+import { getFileRef, getBoardsCollection } from '../api';
 
 const UploadFile = () => {
   const { docId } = useParams();
   const [loading, setIsLoading] = React.useState(false);
+  const { user } = useStoreon('user');
 
   const uploadFileToFB = file => {
-    const mapRef = getDocFileRef(docId, file.name);
+    const mapRef = getFileRef(user.uid, docId, file.name);
+
     const uploadTask = mapRef.put(file);
 
     uploadTask.on(
@@ -25,7 +28,7 @@ const UploadFile = () => {
         setIsLoading(false);
       },
       () => {
-        const documentRef = getDocRef(docId);
+        const documentRef = getBoardsCollection(user.uid).doc(docId);
         documentRef.update({
           mapName: uploadTask.snapshot.ref.name
         });

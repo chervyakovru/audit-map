@@ -1,12 +1,13 @@
 import React from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import useStoreon from 'storeon/react';
 
 import { MdHome } from 'react-icons/md';
 import { AiOutlineDownload } from 'react-icons/ai';
 
 import {
-  getDocRef,
-  getDocFileUrl,
+  getFileRef,
+  getBoardsCollection,
   getPointsCollection,
   getThemesCollection,
   getERCollection
@@ -39,9 +40,11 @@ const getImageSize = (w, h) => {
   };
 };
 
-const MapComponent = () => {
+const Board = () => {
   const history = useHistory();
   const { docId } = useParams();
+  const { user } = useStoreon('user');
+
   const [doc, setDoc] = React.useState({ data: {}, loaded: false });
   const [points, setPoints] = React.useState({ data: [], loaded: false });
   const [image, setImage] = React.useState({
@@ -63,13 +66,15 @@ const MapComponent = () => {
   }, [requestValue]);
 
   React.useEffect(() => {
-    return getDocRef(docId).onSnapshot(snapshot => {
-      const fetchedDocument = {
-        ...snapshot.data(),
-        id: snapshot.id
-      };
-      setDoc({ data: fetchedDocument, loaded: true });
-    });
+    return getBoardsCollection(user.uid)
+      .doc(docId)
+      .onSnapshot(snapshot => {
+        const fetchedDocument = {
+          ...snapshot.data(),
+          id: snapshot.id
+        };
+        setDoc({ data: fetchedDocument, loaded: true });
+      });
   }, []);
 
   React.useEffect(() => {
@@ -81,26 +86,28 @@ const MapComponent = () => {
         exists: false
       });
     } else {
-      getDocFileUrl(docId, doc.data.mapName).then(url => {
-        const tmpImg = new Image();
-        tmpImg.addEventListener('load', () => {
-          const imageSize = getImageSize(tmpImg.width, tmpImg.height);
-          setImage({
-            data: {
-              src: url,
-              ...imageSize
-            },
-            loaded: true,
-            exists: true
+      getFileRef(user.uid, docId, doc.data.mapName)
+        .getDownloadURL()
+        .then(url => {
+          const tmpImg = new Image();
+          tmpImg.addEventListener('load', () => {
+            const imageSize = getImageSize(tmpImg.width, tmpImg.height);
+            setImage({
+              data: {
+                src: url,
+                ...imageSize
+              },
+              loaded: true,
+              exists: true
+            });
           });
+          tmpImg.src = url;
         });
-        tmpImg.src = url;
-      });
     }
   }, [doc]);
 
   React.useEffect(() => {
-    getPointsCollection(docId)
+    getPointsCollection(user.uid, docId)
       .get()
       .then(querySnapshot => {
         const fetchedPoints = querySnapshot.docs.map(point => ({
@@ -112,8 +119,10 @@ const MapComponent = () => {
   }, []);
 
   const downloadDocument = () => {
-    const pointsRequest = getPointsCollection(docId).get();
-    const documentRequest = getDocRef(docId).get();
+    const pointsRequest = getPointsCollection(user.uid, docId).get();
+    const documentRequest = getBoardsCollection(user.uid)
+      .doc(docId)
+      .get();
     const themesRequest = getThemesCollection().get();
     const violationsRequest = getERCollection().get();
 
@@ -135,8 +144,7 @@ const MapComponent = () => {
       const request = {};
 
       fetchedPoints.forEach(point => {
-        const violations = point.violationsId;
-        violations.forEach(violationId => {
+        point.violationsId.forEach(violationId => {
           const violation = fetchedViolations[violationId];
           const theme = fetchedThemes[violation.theme_id];
           if (!(theme in request)) {
@@ -169,8 +177,9 @@ const MapComponent = () => {
         </Button>
         <Button onClick={downloadDocument} tooltip="Скачать документ">
           <form
+            style={{ display: 'none' }}
             method="POST"
-            action="/projects/audit/api/word/createDocument.php"
+            action="/api/word/createDocument.php"
             ref={formRef}
           >
             <input type="hidden" name="violations" value={requestValue} />
@@ -191,4 +200,4 @@ const MapComponent = () => {
   );
 };
 
-export default MapComponent;
+export default Board;
