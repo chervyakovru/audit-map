@@ -1,12 +1,12 @@
 import React from 'react';
-import { getPointRef, getERCollection } from '../../api';
+import { getPointsCollection, getERCollection } from '../../api';
 
 import Option from './Option';
 import styles from './Modal.module.css';
 
 const ELEMENTS_OFFSET = 20;
 
-const Options = ({ docId, point }) => {
+const Options = ({ userId, docId, point }) => {
   const [searchValue, setSearchValue] = React.useState('');
   const [violations, setViolations] = React.useState(null);
   const [visibleViolations, setVisibleViolations] = React.useState(null);
@@ -31,7 +31,7 @@ const Options = ({ docId, point }) => {
   }, []);
 
   const removeViolationId = violationId => {
-    const pointRef = getPointRef(docId, point.id);
+    const pointRef = getPointsCollection(userId, docId).doc(point.id);
     const newViolationsId = point.violationsId.filter(id => id !== violationId);
     pointRef.update({
       violationsId: newViolationsId
@@ -39,7 +39,7 @@ const Options = ({ docId, point }) => {
   };
 
   const addViolationId = violationId => {
-    const pointRef = getPointRef(docId, point.id);
+    const pointRef = getPointsCollection(userId, docId).doc(point.id);
     const newViolationsId = [...point.violationsId, violationId];
     pointRef.update({
       violationsId: newViolationsId

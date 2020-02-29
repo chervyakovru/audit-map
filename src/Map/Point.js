@@ -1,37 +1,21 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import UIkit from 'uikit';
-
-import { getPointRef } from '../api';
 
 import styles from './Map.module.css';
 
 const handleKeyPress = () => {};
 
-const Point = ({ docId, scale, point }) => {
+const Point = ({ onDeletePoint, scale, point }) => {
   const history = useHistory();
   const [pressed, setPressed] = React.useState(false);
   const pointScale = 1 / scale;
-
-  const showModal = () => {
-    UIkit.modal
-      .confirm(`Вы уверены, что хотите удалить точку "${point.name}"?`, {
-        labels: { cancel: 'Отмена', ok: 'Да' },
-        bgClose: true,
-        escClose: true
-      })
-      .then(() => {
-        const pointRef = getPointRef(docId, point.id);
-        pointRef.delete();
-      });
-  };
 
   const onContext = e => {
     e.preventDefault();
     e.stopPropagation();
 
-    showModal();
+    onDeletePoint(point);
   };
 
   const onTouchEnd = () => {
@@ -43,7 +27,7 @@ const Point = ({ docId, scale, point }) => {
       setPressed(true);
       setTimeout(() => {
         if (pressed) {
-          showModal();
+          onDeletePoint(point);
         }
       }, 1000);
     }

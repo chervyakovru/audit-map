@@ -1,34 +1,42 @@
 import React from 'react';
-import StoreContext from 'storeon/react/context';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect
+  Redirect,
+  Link
 } from 'react-router-dom';
+
+import StoreContext from 'storeon/react/context';
+import useStoreon from 'storeon/react';
 import store from './store';
 
-import Board from './Board';
-import Dashboard from './Dashboard';
-import PublicHomePage from './PublicHomePage';
+import firebase from './firebase';
+import PrivateRoute from './Auth/PrivateRoute';
+
+import Home from './Home';
+import Login from './Login';
+import SignUp from './SignUp';
 
 const App = () => {
-  const loggedIn = false;
+  const { dispatch } = useStoreon();
+
+  React.useEffect(() => {
+    firebase.auth().onAuthStateChanged(user => {
+      dispatch('user/set', user);
+    });
+  }, []);
 
   return (
-    <Router basename="/projects/audit">
+    <Router>
       <Switch>
-        <Route exact path="/">
-          {loggedIn ? <Redirect to="/dashboard" /> : <PublicHomePage />}
-        </Route>
-        <Route path="/dashboard">
-          <Dashboard />
-        </Route>
-        <Route path="/board/:docId">
-          <Board />
-        </Route>
+        <Redirect exact path="/" to="/dashboard" />
+        <PrivateRoute path="/dashboard" component={Home} />
+        <Route path="/login" component={Login} />
+        <Route path="/signup" component={SignUp} />
         <Route path="*">
           <h1>404</h1>
+          <Link to="/">На главную</Link>
         </Route>
       </Switch>
     </Router>

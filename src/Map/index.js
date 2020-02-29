@@ -2,8 +2,10 @@
 import React from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useParams, useLocation } from 'react-router-dom';
+import useStoreon from 'storeon/react';
+import UIkit from 'uikit';
 
-import { getDocRef, getPointsCollection } from '../api';
+import { getBoardsCollection, getPointsCollection } from '../api';
 import { getRounded } from '../utils';
 
 import ZoomButtons from './ZoomButtons';
@@ -17,6 +19,8 @@ const handleKeyPress = () => {};
 const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
   const { docId } = useParams();
   const location = useLocation();
+  const { user } = useStoreon('user');
+
   const [dragging, setDragging] = React.useState(false);
   const [doc, setDoc] = React.useState(defaultDocument);
   const [points, setPoints] = React.useState(defaultPoints);
@@ -24,17 +28,19 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
   const mapRef = React.useRef(null);
 
   React.useEffect(() => {
-    return getDocRef(docId).onSnapshot(snapshot => {
-      const fetchedDocument = {
-        ...snapshot.data(),
-        id: snapshot.id
-      };
-      setDoc(fetchedDocument);
-    });
+    getBoardsCollection(user.uid)
+      .doc(docId)
+      .onSnapshot(snapshot => {
+        const fetchedDocument = {
+          ...snapshot.data(),
+          id: snapshot.id
+        };
+        setDoc(fetchedDocument);
+      });
   }, []);
 
   React.useEffect(() => {
-    return getPointsCollection(docId).onSnapshot(querySnapshot => {
+    getPointsCollection(user.uid, docId).onSnapshot(querySnapshot => {
       const fetchedPoints = querySnapshot.docs.map(point => ({
         id: point.id,
         ...point.data()
@@ -70,8 +76,21 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       violationsId: []
     };
 
-    const pointsCollection = getPointsCollection(docId);
+    const pointsCollection = getPointsCollection(user.uid, docId);
     pointsCollection.add(newPoint);
+  };
+
+  const onDeletePoint = point => {
+    UIkit.modal
+      .confirm(`Вы уверены, что хотите удалить точку "${point.name}"?`, {
+        labels: { cancel: 'Отмена', ok: 'Да' },
+        bgClose: true,
+        escClose: true
+      })
+      .then(() => {
+        const pointRef = getPointsCollection(user.uid, docId).doc(point.id);
+        pointRef.delete();
+      });
   };
 
   const modalPointId = location.state && location.state.modalPointId;
@@ -119,6 +138,8 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
                 {points.map(point => (
                   <Point
                     key={point.id}
+                    onDeletePoint={onDeletePoint}
+                    userId={user.uid}
                     docId={docId}
                     scale={scale}
                     point={point}
