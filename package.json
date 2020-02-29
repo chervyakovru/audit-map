@@ -1,8 +1,8 @@
 {
   "name": "audit-map",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "homepage": "https://chervyakov.ru/projects/audit/",
+  "homepage": "/",
   "dependencies": {
     "@storeon/crosstab": "^0.4.1",
     "@storeon/localstorage": "^0.9.0",
