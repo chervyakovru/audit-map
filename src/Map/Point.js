@@ -46,7 +46,7 @@ const Point = ({ onDeletePoint, scale, point }) => {
     <div
       className={`${styles.dot} uk-position-absolute`}
       style={{
-        transform: `translateX(-50%) translateY(-100%) scale(${pointScale})`,
+        transform: `translateX(-15px) translateY(-15px) scale(${pointScale})`,
         left: `${point.x}%`,
         top: `${point.y}%`
       }}
@@ -57,9 +57,9 @@ const Point = ({ onDeletePoint, scale, point }) => {
       onKeyPress={handleKeyPress}
       uk-tooltip={`title: ${point.name}; delay: 500`}
     >
-      <span className={styles.circle}>
-        <span className={styles.title}>{point.name.trim().substr(0, 2)}</span>
-      </span>
+      <div className={styles.circle}>
+        <div className={styles.title}>{point.name.trim().substr(0, 2)}</div>
+      </div>
     </div>
   );
 };
