@@ -3,6 +3,7 @@ import { withRouter, Redirect, Link } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
 import firebase from './firebase';
+import { ROUTES } from './Consts';
 
 const Login = ({ history }) => {
   const [loading, setLoading] = React.useState(false);
@@ -84,7 +85,7 @@ const Login = ({ history }) => {
                       </div>
                       <div className="uk-text-small uk-text-center">
                         Еще не зарегистрированы?{' '}
-                        <Link to="/signup">Создать аккаунт</Link>
+                        <Link to={ROUTES.SIGNUP}>Создать аккаунт</Link>
                       </div>
                     </form>
                   </>

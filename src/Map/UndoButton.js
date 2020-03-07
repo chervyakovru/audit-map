@@ -6,10 +6,12 @@ import { MdUndo, MdHome } from 'react-icons/md';
 import Button from '../Button';
 import BoardPanel from '../BoardPanel';
 
+import { ROUTES } from '../Consts';
+
 const UndoButton = ({ pointsLength, handleUndo, docName }) => {
   return (
     <BoardPanel title={docName}>
-      <Link to="/app" className="uk-link-reset">
+      <Link to={ROUTES.HOME} className="uk-link-reset">
         <Button onClick={null} tooltip="На главную">
           <MdHome size="25px" />
         </Button>
