@@ -6,6 +6,7 @@ import {
   MdFullscreenExit
 } from 'react-icons/md';
 
+import BoardPanel from '../BoardPanel';
 import Button from '../Button';
 
 const ZoomButtons = props => {
@@ -32,20 +33,7 @@ const ZoomButtons = props => {
   const { zoomIn, zoomOut, resetTransform, scale } = props;
 
   return (
-    <div
-      style={{ fontSize: 0 }}
-      className="
-              uk-position-z-index
-              uk-card
-              uk-card-body
-              uk-card-default
-              uk-flex
-              uk-padding-remove
-              uk-position-fixed
-              uk-position-small
-              uk-position-bottom-right
-            "
-    >
+    <BoardPanel position="bottom-right">
       <Button onClick={zoomOut} tooltip="Уменьшить">
         <MdRemove size="25px" />
       </Button>
@@ -67,7 +55,7 @@ const ZoomButtons = props => {
           <MdFullscreen size="25px" />
         </Button>
       )}
-    </div>
+    </BoardPanel>
   );
 };
 

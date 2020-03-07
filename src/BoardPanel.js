@@ -1,9 +1,16 @@
 import React from 'react';
 
-const BoardPanel = ({ children, title }) => {
+const POSITIONS = Object.freeze({
+  'top-left': 'uk-position-top-left',
+  'top-right': 'uk-position-top-right',
+  'bottom-left': 'uk-position-bottom-left',
+  'bottom-right': 'uk-position-bottom-right'
+});
+
+const BoardPanel = ({ children, position }) => {
   return (
     <div
-      className="
+      className={`
         uk-position-z-index
         uk-card
         uk-card-body
@@ -12,29 +19,9 @@ const BoardPanel = ({ children, title }) => {
         uk-padding-remove
         uk-position-fixed
         uk-position-small
-        uk-position-top-left"
+        ${POSITIONS[position]}`}
     >
-      {children[0] || children}
-      {title && (
-        <div className="uk-flex uk-flex-middle">
-          <h3
-            style={{
-              borderLeft: '1px solid #e5e5e5',
-              borderRight: children[1] ? '1px solid #e5e5e5' : ''
-            }}
-            className="
-            uk-margin-remove
-            uk-display-block
-            uk-padding-small
-            uk-padding-remove-top
-            uk-padding-remove-bottom
-            "
-          >
-            {title}
-          </h3>
-        </div>
-      )}
-      {children[1]}
+      {children}
     </div>
   );
 };

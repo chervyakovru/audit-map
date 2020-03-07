@@ -8,6 +8,7 @@ import UIkit from 'uikit';
 import { getBoardsCollection, getPointsCollection } from '../api';
 import { getRounded } from '../utils';
 
+import DocInfoButton from '../DocInfoButtons';
 import ZoomButtons from './ZoomButtons';
 import Point from './Point';
 import Modal from './Modal';
@@ -117,6 +118,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       >
         {({ zoomIn, zoomOut, resetTransform, scale }) => (
           <>
+            <DocInfoButton docId={doc.id} docTitle={doc.name} />
             <ZoomButtons
               zoomIn={zoomIn}
               zoomOut={zoomOut}

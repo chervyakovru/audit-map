@@ -1,23 +1,12 @@
 import React from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
-import { MdHome } from 'react-icons/md';
-import { AiOutlineDownload } from 'react-icons/ai';
-
-import {
-  getFileRef,
-  getBoardsCollection,
-  getPointsCollection,
-  getThemesCollection,
-  getERCollection
-} from '../api';
-import { ROUTES } from '../Consts';
+import { getFileRef, getBoardsCollection, getPointsCollection } from '../api';
 
 import Map from '../Map';
 import UploadFile from './UploadFile';
-import Button from '../Button';
-import BoardPanel from '../BoardPanel';
+import DocInfoButton from '../DocInfoButtons';
 
 const getImageSize = (w, h) => {
   const { clientWidth, clientHeight } = document.documentElement;
@@ -42,7 +31,6 @@ const getImageSize = (w, h) => {
 };
 
 const Board = () => {
-  const history = useHistory();
   const { docId } = useParams();
   const { user } = useStoreon('user');
 
@@ -57,14 +45,6 @@ const Board = () => {
     loaded: false,
     exists: false
   });
-  const formRef = React.useRef(null);
-  const [requestValue, setRequestValue] = React.useState('');
-
-  React.useEffect(() => {
-    if (requestValue.length !== 0) {
-      formRef.current.submit();
-    }
-  }, [requestValue]);
 
   React.useEffect(() => {
     return getBoardsCollection(user.uid)
@@ -119,47 +99,6 @@ const Board = () => {
       });
   }, []);
 
-  const downloadDocument = () => {
-    const pointsRequest = getPointsCollection(user.uid, docId).get();
-    const documentRequest = getBoardsCollection(user.uid)
-      .doc(docId)
-      .get();
-    const themesRequest = getThemesCollection().get();
-    const violationsRequest = getERCollection().get();
-
-    Promise.all([
-      documentRequest,
-      pointsRequest,
-      themesRequest,
-      violationsRequest
-    ]).then(response => {
-      const fetchedPoints = response[1].docs.map(point => point.data());
-      const fetchedThemes = response[2].docs.reduce((acc, theme) => {
-        const data = theme.data();
-        return { ...acc, [data.id]: data.text };
-      }, {});
-      const fetchedViolations = response[3].docs.map(violation =>
-        violation.data()
-      );
-
-      const request = {};
-
-      fetchedPoints.forEach(point => {
-        point.violationsId.forEach(violationId => {
-          const violation = fetchedViolations[violationId];
-          const theme = fetchedThemes[violation.theme_id];
-          if (!(theme in request)) {
-            request[theme] = [];
-          }
-          const text = `${violation.text} (${point.name})`;
-          request[theme].push({ text });
-        });
-      });
-
-      setRequestValue(JSON.stringify(request));
-    });
-  };
-
   if (!doc.loaded || !image.loaded || !points.loaded) {
     return (
       <div className="main">
@@ -170,26 +109,16 @@ const Board = () => {
     );
   }
 
+  console.log(doc);
+  console.log(doc.data.name);
+
   return (
     <>
-      <BoardPanel title={doc.data.name}>
-        <Button onClick={() => history.push(ROUTES.HOME)} tooltip="На главную">
-          <MdHome size="25px" />
-        </Button>
-        <Button onClick={downloadDocument} tooltip="Скачать документ">
-          <form
-            style={{ display: 'none' }}
-            method="POST"
-            action="/api/word/createDocument.php"
-            ref={formRef}
-          >
-            <input type="hidden" name="violations" value={requestValue} />
-          </form>
-          <AiOutlineDownload size="25px" />
-        </Button>
-      </BoardPanel>
       {!image.exists ? (
-        <UploadFile />
+        <>
+          <DocInfoButton docId={doc.data.id} docTitle={doc.data.name} />
+          <UploadFile />
+        </>
       ) : (
         <Map
           defaultDocument={doc.data}

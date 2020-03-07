@@ -130,7 +130,10 @@ const Options = ({ userId, docId, point }) => {
     return output;
   };
 
-  const clearSearch = () => {
+  const clearSearch = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
     setSearchValue('');
   };
 
