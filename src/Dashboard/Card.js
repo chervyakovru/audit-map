@@ -1,6 +1,6 @@
 import React from 'react';
 import UIkit from 'uikit';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
 import { MdMoreHoriz } from 'react-icons/md';
@@ -8,13 +8,13 @@ import { AiOutlineFileImage } from 'react-icons/ai';
 
 import { fbTimestamp, getBoardsCollection, getFileRef } from '../api';
 import { useOutsideClick, notificationDate } from '../utils';
+import { ROUTES } from '../Consts';
 
 import styles from './Dashboard.module.css';
 
 const Card = ({ doc }) => {
   const history = useHistory();
   const { user } = useStoreon('user');
-  const { path } = useRouteMatch();
 
   const [selected, setSelected] = React.useState(false);
   const [thumbnail, setThumbnail] = React.useState({
@@ -91,13 +91,14 @@ const Card = ({ doc }) => {
         escClose: true
       })
       .then(() => {
+        getFileRef(user.uid, doc.id, doc.mapName).delete();
         getBoardsCollection(user.uid)
           .doc(doc.id)
           .delete();
       });
   };
   const goTo = () => {
-    history.push(`${path}/board/${doc.id}`);
+    history.push(ROUTES.BOARD(doc.id));
   };
 
   const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();

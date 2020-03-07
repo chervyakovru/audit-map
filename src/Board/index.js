@@ -12,6 +12,7 @@ import {
   getThemesCollection,
   getERCollection
 } from '../api';
+import { ROUTES } from '../Consts';
 
 import Map from '../Map';
 import UploadFile from './UploadFile';
@@ -172,7 +173,7 @@ const Board = () => {
   return (
     <>
       <BoardPanel title={doc.data.name}>
-        <Button onClick={() => history.push('/dashboard')} tooltip="На главную">
+        <Button onClick={() => history.push(ROUTES.HOME)} tooltip="На главную">
           <MdHome size="25px" />
         </Button>
         <Button onClick={downloadDocument} tooltip="Скачать документ">
