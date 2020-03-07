@@ -1,22 +1,21 @@
 import React from 'react';
 import UIkit from 'uikit';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useRouteMatch } from 'react-router-dom';
+import useStoreon from 'storeon/react';
 
 import { MdMoreHoriz } from 'react-icons/md';
 import { AiOutlineFileImage } from 'react-icons/ai';
 
-import {
-  getDocumentsCollection,
-  getDocRef,
-  fbTimestamp,
-  getDocFileUrl
-} from '../api';
+import { fbTimestamp, getBoardsCollection, getFileRef } from '../api';
 import { useOutsideClick, notificationDate } from '../utils';
 
 import styles from './Dashboard.module.css';
 
 const Card = ({ doc }) => {
   const history = useHistory();
+  const { user } = useStoreon('user');
+  const { path } = useRouteMatch();
+
   const [selected, setSelected] = React.useState(false);
   const [thumbnail, setThumbnail] = React.useState({
     data: null,
@@ -31,7 +30,7 @@ const Card = ({ doc }) => {
       setThumbnail({ data: null, loaded: true, exist: false });
       return;
     }
-    getDocFileUrl(doc.id, doc.thumbnail)
+    getFileRef(user.uid, doc.id, doc.thumbnail)
       .then(url => {
         setThumbnail({ data: url, loaded: true, exist: true });
       })
@@ -62,7 +61,7 @@ const Card = ({ doc }) => {
         escClose: true
       })
       .then(name => {
-        const documentRef = getDocRef(doc.id);
+        const documentRef = getBoardsCollection(user.uid).doc(doc.id);
         documentRef.update({ name });
       });
   };
@@ -72,10 +71,9 @@ const Card = ({ doc }) => {
     UIkit.dropdown(dropdownRef.current).hide();
     setSelected(false);
 
-    const { id, ...docWithoutId } = doc;
-    const collection = getDocumentsCollection();
+    // TODO realize deep copy (copy map image and dots)
+    const collection = getBoardsCollection(user.uid);
     collection.add({
-      ...docWithoutId,
       name: `${doc.name} (Копия)`,
       lastUpdate: fbTimestamp
     });
@@ -93,12 +91,13 @@ const Card = ({ doc }) => {
         escClose: true
       })
       .then(() => {
-        const collection = getDocumentsCollection();
-        collection.doc(doc.id).delete();
+        getBoardsCollection(user.uid)
+          .doc(doc.id)
+          .delete();
       });
   };
   const goTo = () => {
-    history.push(`/board/${doc.id}`);
+    history.push(`${path}/board/${doc.id}`);
   };
 
   const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();

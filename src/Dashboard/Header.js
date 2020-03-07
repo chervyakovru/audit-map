@@ -1,4 +1,5 @@
 import React from 'react';
+import firebase from '../firebase';
 
 const Header = () => {
   return (
@@ -9,6 +10,19 @@ const Header = () => {
             <div className="uk-navbar-left">
               <div className="uk-navbar-item">
                 <h3 className="uk-margin-remove">Все документы</h3>
+              </div>
+            </div>
+            <div className="uk-navbar-right">
+              <div className="uk-navbar-item">
+                <button
+                  type="button"
+                  className="uk-button uk-button-text"
+                  onClick={() => {
+                    firebase.auth().signOut();
+                  }}
+                >
+                  Выйти
+                </button>
               </div>
             </div>
           </div>

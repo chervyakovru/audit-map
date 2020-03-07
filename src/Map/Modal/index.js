@@ -1,6 +1,8 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { getPointRef } from '../../api';
+import useStoreon from 'storeon/react';
+
+import { getPointsCollection } from '../../api';
 import { useOutsideClick, useKeyUp } from '../../utils';
 
 import Options from './Options';
@@ -8,22 +10,26 @@ import styles from './Modal.module.css';
 
 const Modal = ({ docId, pointId }) => {
   const history = useHistory();
+  const { user } = useStoreon('user');
+
   const [point, setPoint] = React.useState({ data: null, loaded: false });
   const content = React.useRef(null);
 
   React.useEffect(() => {
-    return getPointRef(docId, pointId).onSnapshot(snapshot => {
-      const fetchedPoint = {
-        ...snapshot.data(),
-        id: snapshot.id
-      };
-      setPoint({ data: fetchedPoint, loaded: true });
-    });
+    return getPointsCollection(user.uid, docId)
+      .doc(pointId)
+      .onSnapshot(snapshot => {
+        const fetchedPoint = {
+          ...snapshot.data(),
+          id: snapshot.id
+        };
+        setPoint({ data: fetchedPoint, loaded: true });
+      });
   }, [pointId]);
 
   const onRename = e => {
     const name = e.target.value;
-    const pointRef = getPointRef(docId, point.data.id);
+    const pointRef = getPointsCollection(user.uid, docId).doc(point.data.id);
     pointRef.update({ name });
   };
 
@@ -81,7 +87,7 @@ const Modal = ({ docId, pointId }) => {
               value={point.data.name}
               onChange={onRename}
             />
-            <Options docId={docId} point={point.data} />
+            <Options userId={user.uid} docId={docId} point={point.data} />
           </>
         )}
       </div>
