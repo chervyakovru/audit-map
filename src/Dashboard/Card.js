@@ -91,6 +91,7 @@ const Card = ({ doc }) => {
         escClose: true
       })
       .then(() => {
+        getFileRef(user.uid, doc.id, doc.mapName).delete();
         getBoardsCollection(user.uid)
           .doc(doc.id)
           .delete();
