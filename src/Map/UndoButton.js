@@ -9,7 +9,7 @@ import BoardPanel from '../BoardPanel';
 const UndoButton = ({ pointsLength, handleUndo, docName }) => {
   return (
     <BoardPanel title={docName}>
-      <Link to="/dashboard" className="uk-link-reset">
+      <Link to="/app" className="uk-link-reset">
         <Button onClick={null} tooltip="На главную">
           <MdHome size="25px" />
         </Button>

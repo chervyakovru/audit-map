@@ -172,7 +172,7 @@ const Board = () => {
   return (
     <>
       <BoardPanel title={doc.data.name}>
-        <Button onClick={() => history.push('/dashboard')} tooltip="На главную">
+        <Button onClick={() => history.push('/app')} tooltip="На главную">
           <MdHome size="25px" />
         </Button>
         <Button onClick={downloadDocument} tooltip="Скачать документ">
