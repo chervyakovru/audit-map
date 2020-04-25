@@ -45,8 +45,6 @@ const Card = ({ doc }) => {
   const onSelect = e => {
     e.preventDefault();
     e.stopPropagation();
-
-    setSelected(true);
   };
   const onRename = e => {
     e.preventDefault();
