@@ -13,20 +13,20 @@ const getImageSize = (w, h) => {
   if (w < clientWidth && h < clientHeight) {
     return {
       width: w,
-      height: h
+      height: h,
     };
   }
   if (clientWidth < clientHeight) {
     const ratio = h / w;
     return {
       width: clientWidth * 0.9,
-      height: clientWidth * 0.9 * ratio
+      height: clientWidth * 0.9 * ratio,
     };
   }
   const ratio = w / h;
   return {
     width: clientHeight * 0.9 * ratio,
-    height: clientHeight * 0.9
+    height: clientHeight * 0.9,
   };
 };
 
@@ -40,10 +40,10 @@ const Board = () => {
     data: {
       src: '',
       width: 0,
-      height: 0
+      height: 0,
     },
     loaded: false,
-    exists: false
+    exists: false,
   });
 
   React.useEffect(() => {
@@ -52,7 +52,7 @@ const Board = () => {
       .onSnapshot(snapshot => {
         const fetchedDocument = {
           ...snapshot.data(),
-          id: snapshot.id
+          id: snapshot.id,
         };
         setDoc({ data: fetchedDocument, loaded: true });
       });
@@ -64,7 +64,7 @@ const Board = () => {
       setImage({
         ...image,
         loaded: true,
-        exists: false
+        exists: false,
       });
     } else {
       getFileRef(user.uid, docId, doc.data.mapName)
@@ -76,10 +76,10 @@ const Board = () => {
             setImage({
               data: {
                 src: url,
-                ...imageSize
+                ...imageSize,
               },
               loaded: true,
-              exists: true
+              exists: true,
             });
           });
           tmpImg.src = url;
@@ -93,7 +93,7 @@ const Board = () => {
       .then(querySnapshot => {
         const fetchedPoints = querySnapshot.docs.map(point => ({
           id: point.id,
-          ...point.data()
+          ...point.data(),
         }));
         setPoints({ data: fetchedPoints, loaded: true });
       });
@@ -120,11 +120,7 @@ const Board = () => {
           <UploadFile />
         </>
       ) : (
-        <Map
-          defaultDocument={doc.data}
-          defaultPoints={points.data}
-          image={image.data}
-        />
+        <Map defaultDocument={doc.data} defaultPoints={points.data} image={image.data} />
       )}
     </>
   );

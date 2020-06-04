@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  MdAdd,
-  MdRemove,
-  MdFullscreen,
-  MdFullscreenExit
-} from 'react-icons/md';
+import { MdAdd, MdRemove, MdFullscreen, MdFullscreenExit } from 'react-icons/md';
 
 import BoardPanel from '../BoardPanel';
 import Button from '../Button';
@@ -44,10 +39,7 @@ const ZoomButtons = props => {
         <b>{Math.round(scale * 100)}%</b>
       </Button>
       {fullscreen ? (
-        <Button
-          onClick={exitFullscreen}
-          tooltip="Выйти из полноэкранного режима"
-        >
+        <Button onClick={exitFullscreen} tooltip="Выйти из полноэкранного режима">
           <MdFullscreenExit size="25px" />
         </Button>
       ) : (

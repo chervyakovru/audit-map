@@ -29,20 +29,7 @@ export const useKeyUp = callback => {
   });
 };
 
-const shortMonthNames = [
-  'Янв',
-  'Фев',
-  'Март',
-  'Апр',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Авг',
-  'Сен',
-  'Окт',
-  'Ноя',
-  'Дек'
-];
+const shortMonthNames = ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
 
 export const notificationDate = date => {
   const day = date.getDate();

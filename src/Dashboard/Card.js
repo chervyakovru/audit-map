@@ -20,7 +20,7 @@ const Card = ({ doc }) => {
   const [thumbnail, setThumbnail] = React.useState({
     data: null,
     loaded: false,
-    isExist: false
+    isExist: false,
   });
   const moreButtonRef = React.useRef();
   const dropdownRef = React.useRef();
@@ -56,7 +56,7 @@ const Card = ({ doc }) => {
       .prompt('Название документа:', doc.name, {
         labels: { cancel: 'Отмена', ok: 'Сохранить' },
         bgClose: true,
-        escClose: true
+        escClose: true,
       })
       .then(name => {
         const documentRef = getBoardsCollection(user.uid).doc(doc.id);
@@ -73,7 +73,7 @@ const Card = ({ doc }) => {
     const collection = getBoardsCollection(user.uid);
     collection.add({
       name: `${doc.name} (Копия)`,
-      lastUpdate: fbTimestamp
+      lastUpdate: fbTimestamp,
     });
   };
   const onDelete = e => {
@@ -86,7 +86,7 @@ const Card = ({ doc }) => {
       .confirm('Вы уверены, что хотите удалить проект?', {
         labels: { cancel: 'Отмена', ok: 'Да' },
         bgClose: true,
-        escClose: true
+        escClose: true,
       })
       .then(() => {
         getFileRef(user.uid, doc.id, doc.mapName).delete();
@@ -166,30 +166,18 @@ const Card = ({ doc }) => {
       >
         <ul className={`${styles.dropdown} uk-nav uk-dropdown-nav`}>
           <li>
-            <button
-              onClick={onRename}
-              type="button"
-              className={styles.listElement}
-            >
+            <button onClick={onRename} type="button" className={styles.listElement}>
               Переименовать
             </button>
           </li>
           <li>
-            <button
-              onClick={onDouble}
-              type="button"
-              className={styles.listElement}
-            >
+            <button onClick={onDouble} type="button" className={styles.listElement}>
               Дублировать
             </button>
           </li>
           <li className="uk-nav-divider uk-margin-remove" />
           <li>
-            <button
-              onClick={onDelete}
-              type="button"
-              className={`${styles.listElement} uk-text-danger`}
-            >
+            <button onClick={onDelete} type="button" className={`${styles.listElement} uk-text-danger`}>
               Удалить
             </button>
           </li>

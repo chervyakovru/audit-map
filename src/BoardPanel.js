@@ -4,7 +4,7 @@ const POSITIONS = Object.freeze({
   'top-left': 'uk-position-top-left',
   'top-right': 'uk-position-top-right',
   'bottom-left': 'uk-position-bottom-left',
-  'bottom-right': 'uk-position-bottom-right'
+  'bottom-right': 'uk-position-bottom-right',
 });
 
 const BoardPanel = ({ children, position }) => {

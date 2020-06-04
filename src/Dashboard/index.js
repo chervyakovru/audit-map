@@ -17,7 +17,7 @@ const Dashboard = () => {
       const fetchedDocuments = querySnapshot.docs.map(doc => {
         return {
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         };
       });
       setDocuments({ data: fetchedDocuments, loaded: true });
@@ -27,18 +27,14 @@ const Dashboard = () => {
   const createNewBoard = () => {
     getBoardsCollection(user.uid).add({
       name: 'Новый документ',
-      lastUpdate: fbTimestamp
+      lastUpdate: fbTimestamp,
     });
   };
 
   return (
     <>
       <Header />
-      <div
-        className="uk-section"
-        style={{ height: 'calc(100% - 80px)' }}
-        uk-overflow-auto="true"
-      >
+      <div className="uk-section" style={{ height: 'calc(100% - 80px)' }} uk-overflow-auto="true">
         <div className="uk-container">
           <div
             className="

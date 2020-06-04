@@ -5,5 +5,5 @@ export const ROUTES = {
   SIGNUP: '/signup',
   HOME: '/app',
   BOARD: boardId => `/app/board/${boardId}`,
-  BOARD_MATCH: `/app/board/:docId`
+  BOARD_MATCH: `/app/board/:docId`,
 };

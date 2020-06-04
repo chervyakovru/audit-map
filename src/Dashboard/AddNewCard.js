@@ -19,9 +19,7 @@ const AddNewCard = ({ createNewBoard }) => (
     <div className="uk-position-center">
       <GoPlusSmall size={60} color="#fff" />
     </div>
-    <p className="uk-position-small uk-position-bottom-center">
-      Новый документ
-    </p>
+    <p className="uk-position-small uk-position-bottom-center">Новый документ</p>
   </div>
 );
 

@@ -30,7 +30,7 @@ const UploadFile = () => {
       () => {
         const documentRef = getBoardsCollection(user.uid).doc(docId);
         documentRef.update({
-          mapName: uploadTask.snapshot.ref.name
+          mapName: uploadTask.snapshot.ref.name,
         });
       }
     );
@@ -46,7 +46,7 @@ const UploadFile = () => {
       uploadFileToFB(file);
     },
     onDropRejected: () => console.log('onDropRejected'),
-    preventDropOnDocument: false
+    preventDropOnDocument: false,
   });
 
   return (
@@ -65,13 +65,8 @@ const UploadFile = () => {
             uk-position-center
             uk-padding"
           >
-            <span
-              className="uk-margin-small-right"
-              uk-icon="icon: cloud-upload"
-            />
-            <span className="uk-text-middle">
-              Перетащите файл в окно браузера или нажмите в любом месте
-            </span>
+            <span className="uk-margin-small-right" uk-icon="icon: cloud-upload" />
+            <span className="uk-text-middle">Перетащите файл в окно браузера или нажмите в любом месте</span>
           </div>
         )}
       </div>

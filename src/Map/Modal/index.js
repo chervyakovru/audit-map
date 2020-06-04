@@ -21,7 +21,7 @@ const Modal = ({ docId, pointId }) => {
       .onSnapshot(snapshot => {
         const fetchedPoint = {
           ...snapshot.data(),
-          id: snapshot.id
+          id: snapshot.id,
         };
         setPoint({ data: fetchedPoint, loaded: true });
       });
@@ -69,12 +69,7 @@ const Modal = ({ docId, pointId }) => {
           uk-flex-column
           uk-overflow-hidden"
       >
-        <button
-          onClick={closeModal}
-          type="button"
-          uk-close="true"
-          className="uk-padding-small uk-position-top-right"
-        />
+        <button onClick={closeModal} type="button" uk-close="true" className="uk-padding-small uk-position-top-right" />
         {!point.loaded ? (
           <div className="uk-position-center">
             <div uk-spinner="ratio: 2" />

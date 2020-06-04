@@ -5,12 +5,7 @@ import useStoreon from 'storeon/react';
 import { MdHome } from 'react-icons/md';
 import { AiOutlineDownload } from 'react-icons/ai';
 
-import {
-  getBoardsCollection,
-  getPointsCollection,
-  getThemesCollection,
-  getERCollection
-} from '../api';
+import { getBoardsCollection, getPointsCollection, getThemesCollection, getERCollection } from '../api';
 import { ROUTES } from '../Consts';
 
 import Button from '../Button';
@@ -36,20 +31,13 @@ const DocInfoButton = ({ docId, docTitle }) => {
     const themesRequest = getThemesCollection().get();
     const violationsRequest = getERCollection().get();
 
-    Promise.all([
-      documentRequest,
-      pointsRequest,
-      themesRequest,
-      violationsRequest
-    ]).then(response => {
+    Promise.all([documentRequest, pointsRequest, themesRequest, violationsRequest]).then(response => {
       const fetchedPoints = response[1].docs.map(point => point.data());
       const fetchedThemes = response[2].docs.reduce((acc, theme) => {
         const data = theme.data();
         return { ...acc, [data.id]: data.text };
       }, {});
-      const fetchedViolations = response[3].docs.map(violation =>
-        violation.data()
-      );
+      const fetchedViolations = response[3].docs.map(violation => violation.data());
 
       const request = {};
 
@@ -78,7 +66,7 @@ const DocInfoButton = ({ docId, docTitle }) => {
         <h3
           style={{
             borderLeft: '1px solid #e5e5e5',
-            borderRight: '1px solid #e5e5e5'
+            borderRight: '1px solid #e5e5e5',
           }}
           className="
             uk-margin-remove
@@ -92,12 +80,7 @@ const DocInfoButton = ({ docId, docTitle }) => {
         </h3>
       </div>
       <Button onClick={downloadDocument} tooltip="Скачать документ">
-        <form
-          style={{ display: 'none' }}
-          method="POST"
-          action="/api/word/createDocument.php"
-          ref={formRef}
-        >
+        <form style={{ display: 'none' }} method="POST" action="/api/word/createDocument.php" ref={formRef}>
           <input type="hidden" name="violations" value={requestValue} />
         </form>
         <AiOutlineDownload size="25px" />

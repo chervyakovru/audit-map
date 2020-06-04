@@ -15,9 +15,7 @@ const Login = ({ history }) => {
 
       const { email, password } = event.target.elements;
       try {
-        await firebase
-          .auth()
-          .signInWithEmailAndPassword(email.value, password.value);
+        await firebase.auth().signInWithEmailAndPassword(email.value, password.value);
         history.push('/');
       } catch (error) {
         alert(error);
@@ -34,10 +32,7 @@ const Login = ({ history }) => {
   }
 
   return (
-    <div
-      className="uk-section uk-section-muted uk-flex uk-flex-middle uk-animation-fade"
-      uk-height-viewport="true"
-    >
+    <div className="uk-section uk-section-muted uk-flex uk-flex-middle uk-animation-fade" uk-height-viewport="true">
       <div className="uk-width-1-1">
         <div className="uk-container">
           <div className="uk-grid-margin uk-grid uk-grid-stack" uk-grid="true">
@@ -49,9 +44,7 @@ const Login = ({ history }) => {
                   </div>
                 ) : (
                   <>
-                    <h3 className="uk-card-title uk-text-center">
-                      С возвращением!
-                    </h3>
+                    <h3 className="uk-card-title uk-text-center">С возвращением!</h3>
                     <form onSubmit={handleLogin}>
                       <div className="uk-margin">
                         <div className="uk-inline uk-width-1-1">
@@ -76,16 +69,12 @@ const Login = ({ history }) => {
                         </div>
                       </div>
                       <div className="uk-margin">
-                        <button
-                          type="submit"
-                          className="uk-button uk-button-primary uk-button-large uk-width-1-1"
-                        >
+                        <button type="submit" className="uk-button uk-button-primary uk-button-large uk-width-1-1">
                           Войти
                         </button>
                       </div>
                       <div className="uk-text-small uk-text-center">
-                        Еще не зарегистрированы?{' '}
-                        <Link to={ROUTES.SIGNUP}>Создать аккаунт</Link>
+                        Еще не зарегистрированы? <Link to={ROUTES.SIGNUP}>Создать аккаунт</Link>
                       </div>
                     </form>
                   </>

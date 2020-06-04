@@ -34,7 +34,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       .onSnapshot(snapshot => {
         const fetchedDocument = {
           ...snapshot.data(),
-          id: snapshot.id
+          id: snapshot.id,
         };
         setDoc(fetchedDocument);
       });
@@ -44,7 +44,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
     getPointsCollection(user.uid, docId).onSnapshot(querySnapshot => {
       const fetchedPoints = querySnapshot.docs.map(point => ({
         id: point.id,
-        ...point.data()
+        ...point.data(),
       }));
       setPoints(fetchedPoints);
     });
@@ -74,7 +74,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       x: percentX,
       y: percentY,
       name: `Новая точка`,
-      violationsId: []
+      violationsId: [],
     };
 
     const pointsCollection = getPointsCollection(user.uid, docId);
@@ -86,7 +86,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       .confirm(`Вы уверены, что хотите удалить точку "${point.name}"?`, {
         labels: { cancel: 'Отмена', ok: 'Да' },
         bgClose: true,
-        escClose: true
+        escClose: true,
       })
       .then(() => {
         const pointRef = getPointsCollection(user.uid, docId).doc(point.id);
@@ -101,16 +101,16 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       <TransformWrapper
         options={{
           limitToBounds: false,
-          minScale: 0.5
+          minScale: 0.5,
         }}
         doubleClick={{
-          disabled: true
+          disabled: true,
         }}
         wheel={{
-          step: 50
+          step: 50,
         }}
         zoomIn={{
-          step: 10
+          step: 10,
         }}
         defaultScale={1}
         onPanning={onPanning}
@@ -119,12 +119,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
         {({ zoomIn, zoomOut, resetTransform, scale }) => (
           <>
             <DocInfoButton docId={doc.id} docTitle={doc.name} />
-            <ZoomButtons
-              zoomIn={zoomIn}
-              zoomOut={zoomOut}
-              scale={scale}
-              resetTransform={resetTransform}
-            />
+            <ZoomButtons zoomIn={zoomIn} zoomOut={zoomOut} scale={scale} resetTransform={resetTransform} />
             <TransformComponent>
               <div
                 ref={mapRef}
@@ -134,7 +129,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
                 style={{
                   width: `${image.width}px`,
                   height: `${image.height}px`,
-                  backgroundImage: `url(${image.src})`
+                  backgroundImage: `url(${image.src})`,
                 }}
               >
                 {points.map(point => (

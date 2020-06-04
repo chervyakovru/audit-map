@@ -38,7 +38,7 @@ const Point = ({ onDeletePoint, scale, point }) => {
     e.stopPropagation();
 
     history.push({
-      state: { modalPointId: point.id }
+      state: { modalPointId: point.id },
     });
   };
 
@@ -48,7 +48,7 @@ const Point = ({ onDeletePoint, scale, point }) => {
       style={{
         transform: `translateX(-15px) translateY(-15px) scale(${pointScale})`,
         left: `${point.x}%`,
-        top: `${point.y}%`
+        top: `${point.y}%`,
       }}
       onClick={onClick}
       onContextMenu={onContext}

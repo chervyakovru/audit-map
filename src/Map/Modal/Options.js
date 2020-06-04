@@ -10,9 +10,7 @@ const Options = ({ userId, docId, point }) => {
   const [searchValue, setSearchValue] = React.useState('');
   const [violations, setViolations] = React.useState(null);
   const [visibleViolations, setVisibleViolations] = React.useState(null);
-  const [visibleElementsCount, setVisibleElementsCount] = React.useState(
-    ELEMENTS_OFFSET
-  );
+  const [visibleElementsCount, setVisibleElementsCount] = React.useState(ELEMENTS_OFFSET);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -21,7 +19,7 @@ const Options = ({ userId, docId, point }) => {
 
       const fetchedViolations = data.docs.map(violation => ({
         id: violation.id,
-        ...violation.data()
+        ...violation.data(),
       }));
 
       setViolations(fetchedViolations);
@@ -34,7 +32,7 @@ const Options = ({ userId, docId, point }) => {
     const pointRef = getPointsCollection(userId, docId).doc(point.id);
     const newViolationsId = point.violationsId.filter(id => id !== violationId);
     pointRef.update({
-      violationsId: newViolationsId
+      violationsId: newViolationsId,
     });
   };
 
@@ -42,7 +40,7 @@ const Options = ({ userId, docId, point }) => {
     const pointRef = getPointsCollection(userId, docId).doc(point.id);
     const newViolationsId = [...point.violationsId, violationId];
     pointRef.update({
-      violationsId: newViolationsId
+      violationsId: newViolationsId,
     });
   };
 
@@ -86,7 +84,7 @@ const Options = ({ userId, docId, point }) => {
 
       const violationWithIndexes = {
         ...violation,
-        foundIndexes: allEntry
+        foundIndexes: allEntry,
       };
       return [...acc, violationWithIndexes];
     }, []);
@@ -118,12 +116,8 @@ const Options = ({ userId, docId, point }) => {
       const endMatch = startMatch + searchLength;
       output.push(
         <>
-          <span className={styles.selected}>
-            {text.slice(startMatch, endMatch)}
-          </span>
-          {i < foundIndexes.length - 1
-            ? text.slice(endMatch, foundIndexes[i + 1])
-            : text.slice(endMatch)}
+          <span className={styles.selected}>{text.slice(startMatch, endMatch)}</span>
+          {i < foundIndexes.length - 1 ? text.slice(endMatch, foundIndexes[i + 1]) : text.slice(endMatch)}
         </>
       );
     }
@@ -164,11 +158,7 @@ const Options = ({ userId, docId, point }) => {
           />
         )}
       </form>
-      <div
-        className="uk-flex uk-flex-column"
-        uk-overflow-auto="true"
-        onScroll={onScroll}
-      >
+      <div className="uk-flex uk-flex-column" uk-overflow-auto="true" onScroll={onScroll}>
         {!visibleViolations && (
           <div className="uk-position-center">
             <div uk-spinner="ratio: 2" />
@@ -179,11 +169,7 @@ const Options = ({ userId, docId, point }) => {
             <p>Нет совпадений</p>
           ) : (
             visibleViolations.slice(0, visibleElementsCount).map(option => {
-              const text = getText(
-                option.text,
-                option.foundIndexes,
-                searchValue.length
-              );
+              const text = getText(option.text, option.foundIndexes, searchValue.length);
               return (
                 <Option
                   key={`${searchValue}_${option.id}`}
