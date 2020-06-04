@@ -95,8 +95,8 @@ const Card = ({ doc }) => {
           .delete();
       });
   };
-  const goTo = () => {
-    history.push(ROUTES.BOARD(doc.id));
+  const navigateToBoard = () => {
+    history.push(ROUTES.BOARD(doc.id, doc.lastOpenedLayer));
   };
 
   const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();
@@ -112,7 +112,7 @@ const Card = ({ doc }) => {
         uk-position-relative`}
       onMouseEnter={() => setSelected(true)}
       onMouseLeave={() => setSelected(false)}
-      onClick={goTo}
+      onClick={navigateToBoard}
       role="button"
       tabIndex={0}
       onKeyPress={() => {}}

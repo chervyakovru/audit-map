@@ -25,10 +25,19 @@ const Dashboard = () => {
   }, []);
 
   const createNewBoard = () => {
-    getBoardsCollection(user.uid).add({
-      name: 'Новый документ',
-      lastUpdate: fbTimestamp,
-    });
+    getBoardsCollection(user.uid)
+      .add({
+        name: 'Новый документ',
+        lastUpdate: fbTimestamp,
+      })
+      .then(docRef => {
+        docRef
+          .collection('layers')
+          .add({ name: 'Новый слой', lastUpdate: fbTimestamp })
+          .then(layerRef => {
+            docRef.update({ lastOpenedLayer: layerRef.id });
+          });
+      });
   };
 
   return (
