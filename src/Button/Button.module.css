@@ -4,10 +4,12 @@
   text-decoration: none;
   user-select: none;
 }
+
 .button:focus {
   color: #000;
   text-decoration: none;
 }
+
 .button:not(:disabled):hover {
   color: #1e87f0;
   text-decoration: none;

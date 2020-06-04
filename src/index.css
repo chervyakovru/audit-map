@@ -1,18 +1,15 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap&subset=cyrillic');
 
 body {
+  overflow: hidden;
   margin: 0;
-  font-family: 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-    'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  overflow: hidden;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 html,
@@ -39,10 +36,12 @@ body,
   .uk-modal {
     padding: 0;
   }
+
   .uk-modal-body {
-    padding-left: 16px;
     padding-right: 16px;
+    padding-left: 16px;
   }
+
   [class*='uk-modal-close-'] {
     top: 0;
     right: 0;

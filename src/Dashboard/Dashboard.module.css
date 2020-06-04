@@ -1,21 +1,26 @@
 .addNewCard {
   cursor: pointer;
 }
+
 .addNewCard:hover {
   background: #0f6ecd;
 }
+
 .card {
   cursor: pointer;
 }
+
 .imageContainer {
-  border-bottom: 1px solid #e5e5e5;
   height: 220px;
+  border-bottom: 1px solid #e5e5e5;
 }
+
 .imageContainer img {
-  object-fit: cover;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
+
 .imageOverlay {
   position: absolute;
   top: 0;
@@ -25,33 +30,39 @@
   background-color: rgba(0, 0, 0, 0.5);
   transition: background-color 0.1s;
 }
+
 .button {
   display: none;
   color: #bfbfbf;
+  outline: none;
   text-decoration: none;
   user-select: none;
-  outline: none;
 }
+
 .button:focus {
   color: #bfbfbf;
   text-decoration: none;
 }
+
 .button:not(:disabled):hover {
   color: #fff;
   text-decoration: none;
 }
+
 .dropdown {
   cursor: default;
 }
+
 .listElement {
-  background: #fff;
-  border: none;
-  outline: none;
   display: block;
   width: 100%;
   padding: 10px 25px;
+  border: none;
+  background: #fff;
   cursor: pointer;
+  outline: none;
 }
+
 .listElement:hover {
   background: #e5e5e5;
 }
