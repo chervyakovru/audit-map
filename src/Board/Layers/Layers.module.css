@@ -1,0 +1,41 @@
+.button {
+  border: none;
+  border-bottom: 1px solid #e5e5e5;
+  background: #f8f8f8;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.button:last-child {
+  border-bottom: none;
+}
+
+.button:hover {
+  background: #efefef;
+}
+
+.activeButton {
+  background: #efefef;
+  cursor: default;
+}
+
+.editIcon,
+.deleteIcon {
+  cursor: pointer;
+}
+
+.editIcon:hover {
+  color: #0f6ecd;
+}
+
+.deleteIcon:hover {
+  color: #f0506e;
+}
+
+.editLayerName {
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 1.5;
+}

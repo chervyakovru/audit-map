@@ -6,6 +6,7 @@ import { getBoardsCollection, getLayersCollection } from '../api';
 
 import DocInfoButton from '../DocInfoButtons';
 import Layer from '../Layer';
+import Layers from './Layers';
 
 const Board = () => {
   const { boardId } = useParams();
@@ -46,7 +47,7 @@ const Board = () => {
     );
   }
 
-  const activeLayer = layers.data.find(layer => layer.id === doc.data.lastOpenedLayer);
+  const activeLayer = layers.data.find(layer => layer.id === doc.data.lastOpenedLayer) || layers.data[0];
 
   return (
     <>
@@ -56,12 +57,7 @@ const Board = () => {
           <Layer />
         </div>
         <div className="uk-flex-none" style={{ width: '480px' }}>
-          <div className="uk-padding-small">
-            <h3 className="uk-margin-bottom">Слои</h3>
-            {layers.data.map(layer => (
-              <p key={layer.id}>{layer.name}</p>
-            ))}
-          </div>
+          <Layers layers={layers} />
         </div>
       </div>
     </>

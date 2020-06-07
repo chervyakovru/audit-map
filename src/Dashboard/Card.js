@@ -35,6 +35,7 @@ const Card = ({ doc }) => {
         setThumbnail({ data: url, loaded: true, exist: true });
       })
       .catch(error => {
+        // eslint-disable-next-line no-console
         console.log('error: ', error);
         setThumbnail({ data: null, loaded: true, exist: false });
       });

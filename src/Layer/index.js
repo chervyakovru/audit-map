@@ -56,7 +56,7 @@ const Layer = () => {
 
         setLayer({ data: fetchedLayer, loaded: true });
       });
-  }, []);
+  }, [layerId]);
 
   React.useEffect(() => {
     if (!layer.loaded) return;
@@ -101,7 +101,7 @@ const Layer = () => {
         }));
         setPoints({ data: fetchedPoints, loaded: true });
       });
-  }, []);
+  }, [layerId]);
 
   if (!layer.loaded || !image.loaded || !points.loaded) {
     return (
