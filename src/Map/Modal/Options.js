@@ -6,7 +6,7 @@ import styles from './Modal.module.css';
 
 const ELEMENTS_OFFSET = 20;
 
-const Options = ({ userId, boardId, point }) => {
+const Options = ({ userId, boardId, layerId, point }) => {
   const [searchValue, setSearchValue] = React.useState('');
   const [violations, setViolations] = React.useState(null);
   const [visibleViolations, setVisibleViolations] = React.useState(null);
@@ -29,7 +29,7 @@ const Options = ({ userId, boardId, point }) => {
   }, []);
 
   const removeViolationId = violationId => {
-    const pointRef = getPointsCollection(userId, boardId).doc(point.id);
+    const pointRef = getPointsCollection(userId, boardId, layerId).doc(point.id);
     const newViolationsId = point.violationsId.filter(id => id !== violationId);
     pointRef.update({
       violationsId: newViolationsId,
@@ -37,7 +37,7 @@ const Options = ({ userId, boardId, point }) => {
   };
 
   const addViolationId = violationId => {
-    const pointRef = getPointsCollection(userId, boardId).doc(point.id);
+    const pointRef = getPointsCollection(userId, boardId, layerId).doc(point.id);
     const newViolationsId = [...point.violationsId, violationId];
     pointRef.update({
       violationsId: newViolationsId,

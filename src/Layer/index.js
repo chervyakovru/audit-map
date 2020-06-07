@@ -5,6 +5,7 @@ import useStoreon from 'storeon/react';
 import { getFileRef, getLayersCollection, getPointsCollection } from '../api';
 
 import UploadFile from '../Board/UploadFile';
+import Map from '../Map';
 
 const getImageSize = (w, h) => {
   const { clientWidth, clientHeight } = document.documentElement;
@@ -112,7 +113,10 @@ const Layer = () => {
     );
   }
 
-  return <div style={{ width: '100%', height: '100%' }}>{!image.exists ? <UploadFile /> : <p>Layer</p>}</div>;
+  if (!image.exists) {
+    return <UploadFile />;
+  }
+  return <Map defaultLayer={layer.data} image={image.data} />;
 };
 
 export default Layer;

@@ -17,7 +17,7 @@ const BoardPanel = ({ children, position }) => {
         uk-card-default
         uk-flex
         uk-padding-remove
-        uk-position-fixed
+        uk-position-absolute
         uk-position-small
         ${POSITIONS[position]}`}
     >

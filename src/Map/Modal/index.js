@@ -1,5 +1,6 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
+
 import useStoreon from 'storeon/react';
 
 import { getPointsCollection } from '../../api';
@@ -8,7 +9,8 @@ import { useOutsideClick, useKeyUp } from '../../utils';
 import Options from './Options';
 import styles from './Modal.module.css';
 
-const Modal = ({ boardId, pointId }) => {
+const Modal = ({ pointId }) => {
+  const { boardId, layerId } = useParams();
   const history = useHistory();
   const { user } = useStoreon('user');
 
@@ -16,7 +18,7 @@ const Modal = ({ boardId, pointId }) => {
   const content = React.useRef(null);
 
   React.useEffect(() => {
-    return getPointsCollection(user.uid, boardId)
+    return getPointsCollection(user.uid, boardId, layerId)
       .doc(pointId)
       .onSnapshot(snapshot => {
         const fetchedPoint = {
@@ -29,7 +31,7 @@ const Modal = ({ boardId, pointId }) => {
 
   const onRename = e => {
     const name = e.target.value;
-    const pointRef = getPointsCollection(user.uid, boardId).doc(point.data.id);
+    const pointRef = getPointsCollection(user.uid, boardId, layerId).doc(point.data.id);
     pointRef.update({ name });
   };
 
@@ -82,7 +84,7 @@ const Modal = ({ boardId, pointId }) => {
               value={point.data.name}
               onChange={onRename}
             />
-            <Options userId={user.uid} boardId={boardId} point={point.data} />
+            <Options userId={user.uid} boardId={boardId} layerId={layerId} point={point.data} />
           </>
         )}
       </div>

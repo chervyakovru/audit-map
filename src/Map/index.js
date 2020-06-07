@@ -5,10 +5,9 @@ import { useParams, useLocation } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 import UIkit from 'uikit';
 
-import { getBoardsCollection, getPointsCollection } from '../api';
+import { getPointsCollection } from '../api';
 import { getRounded } from '../utils';
 
-import DocInfoButton from '../DocInfoButtons';
 import ZoomButtons from './ZoomButtons';
 import Point from './Point';
 import Modal from './Modal';
@@ -17,31 +16,18 @@ import styles from './Map.module.css';
 
 const handleKeyPress = () => {};
 
-const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
-  const { boardId } = useParams();
+const MapComponent = ({ image }) => {
+  const { boardId, layerId } = useParams();
   const location = useLocation();
   const { user } = useStoreon('user');
 
   const [dragging, setDragging] = React.useState(false);
-  const [doc, setDoc] = React.useState(defaultDocument);
-  const [points, setPoints] = React.useState(defaultPoints);
+  const [points, setPoints] = React.useState([]);
 
   const mapRef = React.useRef(null);
 
   React.useEffect(() => {
-    getBoardsCollection(user.uid)
-      .doc(boardId)
-      .onSnapshot(snapshot => {
-        const fetchedDocument = {
-          ...snapshot.data(),
-          id: snapshot.id,
-        };
-        setDoc(fetchedDocument);
-      });
-  }, []);
-
-  React.useEffect(() => {
-    getPointsCollection(user.uid, boardId).onSnapshot(querySnapshot => {
+    getPointsCollection(user.uid, boardId, layerId).onSnapshot(querySnapshot => {
       const fetchedPoints = querySnapshot.docs.map(point => ({
         id: point.id,
         ...point.data(),
@@ -77,7 +63,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       violationsId: [],
     };
 
-    const pointsCollection = getPointsCollection(user.uid, boardId);
+    const pointsCollection = getPointsCollection(user.uid, boardId, layerId);
     pointsCollection.add(newPoint);
   };
 
@@ -89,7 +75,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
         escClose: true,
       })
       .then(() => {
-        const pointRef = getPointsCollection(user.uid, boardId).doc(point.id);
+        const pointRef = getPointsCollection(user.uid, boardId, layerId).doc(point.id);
         pointRef.delete();
       });
   };
@@ -118,7 +104,6 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       >
         {({ zoomIn, zoomOut, resetTransform, scale }) => (
           <>
-            <DocInfoButton boardId={doc.id} docTitle={doc.name} />
             <ZoomButtons zoomIn={zoomIn} zoomOut={zoomOut} scale={scale} resetTransform={resetTransform} />
             <TransformComponent>
               <div
@@ -133,21 +118,14 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
                 }}
               >
                 {points.map(point => (
-                  <Point
-                    key={point.id}
-                    onDeletePoint={onDeletePoint}
-                    userId={user.uid}
-                    boardId={boardId}
-                    scale={scale}
-                    point={point}
-                  />
+                  <Point key={point.id} onDeletePoint={onDeletePoint} scale={scale} point={point} />
                 ))}
               </div>
             </TransformComponent>
           </>
         )}
       </TransformWrapper>
-      {modalPointId && <Modal boardId={doc.id} pointId={modalPointId} />}
+      {modalPointId && <Modal pointId={modalPointId} />}
     </>
   );
 };

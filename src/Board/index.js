@@ -52,7 +52,7 @@ const Board = () => {
     <>
       <DocInfoButton boardId={boardId} layerId={activeLayer.id} docTitle={`${doc.data.name}/${activeLayer.name}`} />
       <div style={{ display: 'flex', height: '100%' }}>
-        <div style={{ width: '100%', height: '100%' }}>
+        <div style={{ width: '100%', height: '100%', position: 'relative', background: '#f8f8f8' }}>
           <Layer />
         </div>
         <div style={{ flex: 'none', width: '480px' }}>
