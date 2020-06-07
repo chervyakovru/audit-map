@@ -51,11 +51,11 @@ const Board = () => {
   return (
     <>
       <DocInfoButton boardId={boardId} layerId={activeLayer.id} docTitle={`${doc.data.name}/${activeLayer.name}`} />
-      <div style={{ display: 'flex', height: '100%' }}>
-        <div style={{ width: '100%', height: '100%', position: 'relative', background: '#f8f8f8' }}>
+      <div className="uk-flex uk-height-1-1">
+        <div className="uk-height-1-1 uk-width-1-1 uk-position-relative uk-background-muted">
           <Layer />
         </div>
-        <div style={{ flex: 'none', width: '480px' }}>
+        <div className="uk-flex-none" style={{ width: '480px' }}>
           <div className="uk-padding-small">
             <h3 className="uk-margin-bottom">Слои</h3>
             {layers.data.map(layer => (
