@@ -48,12 +48,12 @@ const Layer = () => {
     return getLayersCollection(user.uid, boardId)
       .doc(layerId)
       .onSnapshot(layerSnapshot => {
-        const fetchedDocument = {
+        const fetchedLayer = {
           ...layerSnapshot.data(),
           id: layerSnapshot.id,
         };
 
-        setLayer({ data: fetchedDocument, loaded: true });
+        setLayer({ data: fetchedLayer, loaded: true });
       });
   }, []);
 

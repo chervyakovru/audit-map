@@ -8,7 +8,7 @@ import DocInfoButton from '../DocInfoButtons';
 import Layer from '../Layer';
 
 const Board = () => {
-  const { docId } = useParams();
+  const { boardId } = useParams();
   const { user } = useStoreon('user');
 
   const [doc, setDoc] = React.useState({ data: {}, loaded: false });
@@ -16,7 +16,7 @@ const Board = () => {
 
   React.useEffect(() => {
     return getBoardsCollection(user.uid)
-      .doc(docId)
+      .doc(boardId)
       .onSnapshot(boardsSnapshot => {
         const fetchedDocument = {
           ...boardsSnapshot.data(),
@@ -27,7 +27,7 @@ const Board = () => {
   }, []);
 
   React.useEffect(() => {
-    getLayersCollection(user.uid, docId).onSnapshot(layersSnapshot => {
+    getLayersCollection(user.uid, boardId).onSnapshot(layersSnapshot => {
       const fetchedLayers = layersSnapshot.docs.map(layer => ({
         ...layer.data(),
         id: layer.id,
@@ -50,7 +50,7 @@ const Board = () => {
 
   return (
     <>
-      <DocInfoButton docId={docId} layerId={activeLayer.id} docTitle={`${doc.data.name}/${activeLayer.name}`} />
+      <DocInfoButton boardId={boardId} layerId={activeLayer.id} docTitle={`${doc.data.name}/${activeLayer.name}`} />
       <div style={{ display: 'flex', height: '100%' }}>
         <div style={{ width: '100%', height: '100%' }}>
           <Layer />

@@ -18,7 +18,7 @@ import styles from './Map.module.css';
 const handleKeyPress = () => {};
 
 const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
-  const { docId } = useParams();
+  const { boardId } = useParams();
   const location = useLocation();
   const { user } = useStoreon('user');
 
@@ -30,7 +30,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
 
   React.useEffect(() => {
     getBoardsCollection(user.uid)
-      .doc(docId)
+      .doc(boardId)
       .onSnapshot(snapshot => {
         const fetchedDocument = {
           ...snapshot.data(),
@@ -41,7 +41,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
   }, []);
 
   React.useEffect(() => {
-    getPointsCollection(user.uid, docId).onSnapshot(querySnapshot => {
+    getPointsCollection(user.uid, boardId).onSnapshot(querySnapshot => {
       const fetchedPoints = querySnapshot.docs.map(point => ({
         id: point.id,
         ...point.data(),
@@ -77,7 +77,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       violationsId: [],
     };
 
-    const pointsCollection = getPointsCollection(user.uid, docId);
+    const pointsCollection = getPointsCollection(user.uid, boardId);
     pointsCollection.add(newPoint);
   };
 
@@ -89,7 +89,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
         escClose: true,
       })
       .then(() => {
-        const pointRef = getPointsCollection(user.uid, docId).doc(point.id);
+        const pointRef = getPointsCollection(user.uid, boardId).doc(point.id);
         pointRef.delete();
       });
   };
@@ -118,7 +118,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       >
         {({ zoomIn, zoomOut, resetTransform, scale }) => (
           <>
-            <DocInfoButton docId={doc.id} docTitle={doc.name} />
+            <DocInfoButton boardId={doc.id} docTitle={doc.name} />
             <ZoomButtons zoomIn={zoomIn} zoomOut={zoomOut} scale={scale} resetTransform={resetTransform} />
             <TransformComponent>
               <div
@@ -137,7 +137,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
                     key={point.id}
                     onDeletePoint={onDeletePoint}
                     userId={user.uid}
-                    docId={docId}
+                    boardId={boardId}
                     scale={scale}
                     point={point}
                   />
@@ -147,7 +147,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
           </>
         )}
       </TransformWrapper>
-      {modalPointId && <Modal docId={doc.id} pointId={modalPointId} />}
+      {modalPointId && <Modal boardId={doc.id} pointId={modalPointId} />}
     </>
   );
 };

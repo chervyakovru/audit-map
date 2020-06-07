@@ -11,7 +11,7 @@ import { ROUTES } from '../Consts';
 import Button from '../Button';
 import BoardPanel from '../BoardPanel';
 
-const DocInfoButton = ({ docId, layerId, docTitle }) => {
+const DocInfoButton = ({ boardId, layerId, docTitle }) => {
   const history = useHistory();
   const { user } = useStoreon('user');
   const [requestValue, setRequestValue] = React.useState('');
@@ -24,9 +24,9 @@ const DocInfoButton = ({ docId, layerId, docTitle }) => {
   }, [requestValue]);
 
   const downloadDocument = () => {
-    const pointsRequest = getPointsCollection(user.uid, docId, layerId).get();
+    const pointsRequest = getPointsCollection(user.uid, boardId, layerId).get();
     const documentRequest = getBoardsCollection(user.uid)
-      .doc(docId)
+      .doc(boardId)
       .get();
     const themesRequest = getThemesCollection().get();
     const violationsRequest = getERCollection().get();

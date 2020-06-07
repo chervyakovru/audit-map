@@ -8,7 +8,7 @@ import { useOutsideClick, useKeyUp } from '../../utils';
 import Options from './Options';
 import styles from './Modal.module.css';
 
-const Modal = ({ docId, pointId }) => {
+const Modal = ({ boardId, pointId }) => {
   const history = useHistory();
   const { user } = useStoreon('user');
 
@@ -16,7 +16,7 @@ const Modal = ({ docId, pointId }) => {
   const content = React.useRef(null);
 
   React.useEffect(() => {
-    return getPointsCollection(user.uid, docId)
+    return getPointsCollection(user.uid, boardId)
       .doc(pointId)
       .onSnapshot(snapshot => {
         const fetchedPoint = {
@@ -29,7 +29,7 @@ const Modal = ({ docId, pointId }) => {
 
   const onRename = e => {
     const name = e.target.value;
-    const pointRef = getPointsCollection(user.uid, docId).doc(point.data.id);
+    const pointRef = getPointsCollection(user.uid, boardId).doc(point.data.id);
     pointRef.update({ name });
   };
 
@@ -49,7 +49,7 @@ const Modal = ({ docId, pointId }) => {
 
   return (
     <div
-      style={{ background: 'rgba(0,0,0,.3)' }}
+      style={{ background: 'rgba(0, 0, 0, 0.3)' }}
       className="
         uk-position-fixed
         uk-position-cover
@@ -82,7 +82,7 @@ const Modal = ({ docId, pointId }) => {
               value={point.data.name}
               onChange={onRename}
             />
-            <Options userId={user.uid} docId={docId} point={point.data} />
+            <Options userId={user.uid} boardId={boardId} point={point.data} />
           </>
         )}
       </div>

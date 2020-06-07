@@ -4,27 +4,34 @@ import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
-import { getFileRef, getBoardsCollection } from '../api';
+import { getFileRef, getLayersCollection } from '../api';
 
 const UploadFile = () => {
-  const { docId } = useParams();
+  const { boardId, layerId } = useParams();
   const [loading, setIsLoading] = React.useState(false);
   const { user } = useStoreon('user');
 
   const uploadFileToFB = file => {
-    const mapRef = getFileRef(user.uid, docId, file.name);
+    const mapRef = getFileRef(user.uid, boardId, layerId, file.name);
 
     const uploadTask = mapRef.put(file);
 
     uploadTask.on(
       'state_changed',
-      () => {},
-      () => {
+      snapshot => {
+        const { bytesTransferred, totalBytes } = snapshot;
+        const progress = (bytesTransferred / totalBytes) * 100;
+        // eslint-disable-next-line no-console
+        console.log('Handle newProgress update. progress: ', progress);
+      },
+      error => {
         setIsLoading(false);
+        // eslint-disable-next-line no-console
+        console.log('Handle unsuccessful uploads. error: ', error);
       },
       () => {
-        const documentRef = getBoardsCollection(user.uid).doc(docId);
-        documentRef.update({
+        const layerRef = getLayersCollection(user.uid, boardId).doc(layerId);
+        layerRef.update({
           mapName: uploadTask.snapshot.ref.name,
         });
       }

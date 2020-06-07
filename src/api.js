@@ -16,7 +16,7 @@ export const getERCollection = () => {
 };
 
 export const getFileRef = (userId, boardId, layerId, fileName) => {
-  return firebase.storage().ref(`/users/${userId}/boards/${boardId}layers/${layerId}/files/${fileName}`);
+  return firebase.storage().ref(`/users/${userId}/boards/${boardId}/layers/${layerId}/files/${fileName}`);
 };
 
 export const getPointsCollection = (userId, boardId, layerId) => {
