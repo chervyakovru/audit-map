@@ -24,8 +24,10 @@ body,
 }
 
 .main {
+  position: relative;
   height: 100%;
   background-color: #f8f8f8;
+  cursor: pointer;
 }
 
 .uk-modal {

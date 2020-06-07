@@ -18,13 +18,8 @@ const UploadFile = () => {
 
     uploadTask.on(
       'state_changed',
-      snapshot => {
-        const { bytesTransferred, totalBytes } = snapshot;
-        const progress = (bytesTransferred / totalBytes) * 100;
-        console.log('Handle newProgress update. progress: ', progress);
-      },
-      error => {
-        console.log('Handle unsuccessful uploads. error: ', error);
+      () => {},
+      () => {
         setIsLoading(false);
       },
       () => {
@@ -38,19 +33,16 @@ const UploadFile = () => {
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
-    onDragEnter: () => console.log('onDragEnter'),
-    onDragLeave: () => console.log('onDragLeave'),
     onDropAccepted: async acceptedFiles => {
       setIsLoading(true);
       const file = acceptedFiles[0];
       uploadFileToFB(file);
     },
-    onDropRejected: () => console.log('onDropRejected'),
     preventDropOnDocument: false,
   });
 
   return (
-    <div className="main">
+    <div className="main cursor-pointer">
       <div {...getRootProps({ className: 'uk-width-1-1 uk-height-1-1' })}>
         <input {...getInputProps()} />
         {loading ? (

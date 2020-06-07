@@ -2,104 +2,41 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
-import { getFileRef, getBoardsCollection, getPointsCollection } from '../api';
+import { getBoardsCollection, getLayersCollection } from '../api';
 
-import Map from '../Map';
-import UploadFile from './UploadFile';
 import DocInfoButton from '../DocInfoButtons';
-
-const getImageSize = (w, h) => {
-  const { clientWidth, clientHeight } = document.documentElement;
-  if (w < clientWidth && h < clientHeight) {
-    return {
-      width: w,
-      height: h,
-    };
-  }
-  if (clientWidth < clientHeight) {
-    const ratio = h / w;
-    return {
-      width: clientWidth * 0.9,
-      height: clientWidth * 0.9 * ratio,
-    };
-  }
-  const ratio = w / h;
-  return {
-    width: clientHeight * 0.9 * ratio,
-    height: clientHeight * 0.9,
-  };
-};
+import Layer from '../Layer';
 
 const Board = () => {
   const { docId } = useParams();
   const { user } = useStoreon('user');
 
   const [doc, setDoc] = React.useState({ data: {}, loaded: false });
-  const [points, setPoints] = React.useState({ data: [], loaded: false });
-  const [image, setImage] = React.useState({
-    data: {
-      src: '',
-      width: 0,
-      height: 0,
-    },
-    loaded: false,
-    exists: false,
-  });
+  const [layers, setLayers] = React.useState({ data: [], loaded: false });
 
   React.useEffect(() => {
     return getBoardsCollection(user.uid)
       .doc(docId)
-      .onSnapshot(snapshot => {
+      .onSnapshot(boardsSnapshot => {
         const fetchedDocument = {
-          ...snapshot.data(),
-          id: snapshot.id,
+          ...boardsSnapshot.data(),
+          id: boardsSnapshot.id,
         };
         setDoc({ data: fetchedDocument, loaded: true });
       });
   }, []);
 
   React.useEffect(() => {
-    if (!doc.loaded) return;
-    if (!doc.data.mapName) {
-      setImage({
-        ...image,
-        loaded: true,
-        exists: false,
-      });
-    } else {
-      getFileRef(user.uid, docId, doc.data.mapName)
-        .getDownloadURL()
-        .then(url => {
-          const tmpImg = new Image();
-          tmpImg.addEventListener('load', () => {
-            const imageSize = getImageSize(tmpImg.width, tmpImg.height);
-            setImage({
-              data: {
-                src: url,
-                ...imageSize,
-              },
-              loaded: true,
-              exists: true,
-            });
-          });
-          tmpImg.src = url;
-        });
-    }
-  }, [doc]);
-
-  React.useEffect(() => {
-    getPointsCollection(user.uid, docId)
-      .get()
-      .then(querySnapshot => {
-        const fetchedPoints = querySnapshot.docs.map(point => ({
-          id: point.id,
-          ...point.data(),
-        }));
-        setPoints({ data: fetchedPoints, loaded: true });
-      });
+    getLayersCollection(user.uid, docId).onSnapshot(layersSnapshot => {
+      const fetchedLayers = layersSnapshot.docs.map(layer => ({
+        ...layer.data(),
+        id: layer.id,
+      }));
+      setLayers({ data: fetchedLayers, loaded: true });
+    });
   }, []);
 
-  if (!doc.loaded || !image.loaded || !points.loaded) {
+  if (!doc.loaded || !layers.loaded) {
     return (
       <div className="main">
         <div className="uk-position-center uk-text-center">
@@ -109,19 +46,24 @@ const Board = () => {
     );
   }
 
-  console.log(doc);
-  console.log(doc.data.name);
+  const activeLayer = layers.data.find(layer => layer.id === doc.data.lastOpenedLayer);
 
   return (
     <>
-      {!image.exists ? (
-        <>
-          <DocInfoButton docId={doc.data.id} docTitle={doc.data.name} />
-          <UploadFile />
-        </>
-      ) : (
-        <Map defaultDocument={doc.data} defaultPoints={points.data} image={image.data} />
-      )}
+      <DocInfoButton docId={docId} layerId={activeLayer.id} docTitle={`${doc.data.name}/${activeLayer.name}`} />
+      <div style={{ display: 'flex', height: '100%' }}>
+        <div style={{ width: '100%', height: '100%' }}>
+          <Layer />
+        </div>
+        <div style={{ flex: 'none', width: '480px' }}>
+          <div className="uk-padding-small">
+            <h3 className="uk-margin-bottom">Слои</h3>
+            {layers.data.map(layer => (
+              <p key={layer.id}>{layer.name}</p>
+            ))}
+          </div>
+        </div>
+      </div>
     </>
   );
 };
