@@ -1,61 +1,14 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import useStoreon from 'storeon/react';
-
 import { MdHome } from 'react-icons/md';
-import { AiOutlineDownload } from 'react-icons/ai';
-
-import { getBoardsCollection, getPointsCollection, getThemesCollection, getERCollection } from '../api';
 import { ROUTES } from '../Consts';
 
 import Button from '../Button';
 import BoardPanel from '../BoardPanel';
+import DownloadButton from './DownloadButton';
 
-const DocInfoButton = ({ boardId, layerId, docTitle }) => {
+const DocInfoButton = ({ docTitle }) => {
   const history = useHistory();
-  const { user } = useStoreon('user');
-  const [requestValue, setRequestValue] = React.useState('');
-  const formRef = React.useRef(null);
-
-  React.useEffect(() => {
-    if (requestValue.length !== 0) {
-      formRef.current.submit();
-    }
-  }, [requestValue]);
-
-  const downloadDocument = () => {
-    const pointsRequest = getPointsCollection(user.uid, boardId, layerId).get();
-    const documentRequest = getBoardsCollection(user.uid)
-      .doc(boardId)
-      .get();
-    const themesRequest = getThemesCollection().get();
-    const violationsRequest = getERCollection().get();
-
-    Promise.all([documentRequest, pointsRequest, themesRequest, violationsRequest]).then(response => {
-      const fetchedPoints = response[1].docs.map(point => point.data());
-      const fetchedThemes = response[2].docs.reduce((acc, theme) => {
-        const data = theme.data();
-        return { ...acc, [data.id]: data.text };
-      }, {});
-      const fetchedViolations = response[3].docs.map(violation => violation.data());
-
-      const request = {};
-
-      fetchedPoints.forEach(point => {
-        point.violationsId.forEach(violationId => {
-          const violation = fetchedViolations[violationId];
-          const theme = fetchedThemes[violation.theme_id];
-          if (!(theme in request)) {
-            request[theme] = [];
-          }
-          const text = `${violation.text} (${point.name})`;
-          request[theme].push({ text });
-        });
-      });
-
-      setRequestValue(JSON.stringify(request));
-    });
-  };
 
   return (
     <BoardPanel position="top-left">
@@ -79,12 +32,7 @@ const DocInfoButton = ({ boardId, layerId, docTitle }) => {
           {docTitle}
         </h3>
       </div>
-      <Button onClick={downloadDocument} tooltip="Скачать документ">
-        <form style={{ display: 'none' }} method="POST" action="/api/word/createDocument.php" ref={formRef}>
-          <input type="hidden" name="violations" value={requestValue} />
-        </form>
-        <AiOutlineDownload size="25px" />
-      </Button>
+      <DownloadButton />
     </BoardPanel>
   );
 };
