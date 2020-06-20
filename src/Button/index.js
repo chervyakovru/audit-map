@@ -9,7 +9,7 @@ const Button = props => {
       type="button"
       onClick={onClick}
       className={`${styles.button} uk-button uk-button-link uk-padding-small`}
-      uk-tooltip={`title: ${tooltip}; delay: 1500`}
+      uk-tooltip={tooltip ? `title: ${tooltip}; delay: 1500` : ''}
       disabled={disabled}
     >
       {children}

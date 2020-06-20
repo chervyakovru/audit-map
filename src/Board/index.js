@@ -1,12 +1,17 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import useStoreon from 'storeon/react';
+import { MdMenu, MdClose } from 'react-icons/md';
 
 import { getBoardsCollection, getLayersCollection } from '../api';
 
 import DocInfoButton from '../DocInfoButtons';
 import Layer from '../Layer';
 import Layers from './Layers';
+import Button from '../Button';
+import styles from './Board.module.css';
+
+const OPEN_LAYERS_WIDTH = 480;
 
 const Board = () => {
   const { boardId } = useParams();
@@ -14,6 +19,7 @@ const Board = () => {
 
   const [doc, setDoc] = React.useState({ data: {}, loaded: false });
   const [layers, setLayers] = React.useState({ data: [], loaded: false });
+  const [isLayerOpen, setIsLayerOpen] = React.useState(false);
 
   React.useEffect(() => {
     return getBoardsCollection(user.uid)
@@ -47,6 +53,8 @@ const Board = () => {
     );
   }
 
+  const layersWidth = isLayerOpen ? OPEN_LAYERS_WIDTH : 0;
+
   return (
     <>
       <DocInfoButton docTitle={`${doc.data.name}`} />
@@ -54,8 +62,27 @@ const Board = () => {
         <div className="uk-height-1-1 uk-width-1-1 uk-position-relative uk-background-muted">
           <Layer />
         </div>
-        <div className="uk-flex-none" style={{ width: '480px' }}>
-          <Layers layers={layers} />
+        <div className={`${styles.layersContainer} uk-flex-none`} style={{ width: `${layersWidth}px` }}>
+          <div className="uk-position-relative" style={{ width: `${OPEN_LAYERS_WIDTH}px` }}>
+            <div
+              className={`
+                ${styles.menuButton}
+                uk-position-absolute
+                uk-position-z-index
+                uk-card
+                uk-card-body
+                uk-card-default
+                uk-flex
+                uk-padding-remove
+                `}
+            >
+              <Button onClick={() => setIsLayerOpen(!isLayerOpen)}>
+                {isLayerOpen ? <MdClose size="25px" /> : <MdMenu size="25px" />}
+              </Button>
+            </div>
+
+            <Layers layers={layers} />
+          </div>
         </div>
       </div>
     </>
