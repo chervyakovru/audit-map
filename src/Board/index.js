@@ -47,11 +47,9 @@ const Board = () => {
     );
   }
 
-  const activeLayer = layers.data.find(layer => layer.id === doc.data.lastOpenedLayer) || layers.data[0];
-
   return (
     <>
-      <DocInfoButton boardId={boardId} layerId={activeLayer.id} docTitle={`${doc.data.name}/${activeLayer.name}`} />
+      <DocInfoButton docTitle={`${doc.data.name}`} />
       <div className="uk-flex uk-height-1-1">
         <div className="uk-height-1-1 uk-width-1-1 uk-position-relative uk-background-muted">
           <Layer />

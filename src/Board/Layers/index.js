@@ -3,7 +3,7 @@ import useStoreon from 'storeon/react';
 import UIkit from 'uikit';
 
 import { useHistory, useParams } from 'react-router-dom';
-import { MdAddBox } from 'react-icons/md';
+import { MdAddCircleOutline, MdModeEdit, MdDelete } from 'react-icons/md';
 import { ROUTES } from '../../Consts';
 import { fbTimestamp, getBoardsCollection, getLayersCollection, getFileRef } from '../../api';
 
@@ -141,8 +141,9 @@ const Layers = ({ layers }) => {
                       tabIndex={0}
                       className={styles.editIcon}
                       onClick={startEditLayerNameFuncGetter(layer.id, layer.name)}
-                      uk-icon="icon: pencil"
-                    />
+                    >
+                      <MdModeEdit size="25px" />
+                    </span>
                     {!isActiveLayout && (
                       <span
                         onKeyPress={() => {}}
@@ -155,8 +156,9 @@ const Layers = ({ layers }) => {
 
                           deleteLayer(layer.id, layer.name, layer.mapName);
                         }}
-                        uk-icon="icon: trash"
-                      />
+                      >
+                        <MdDelete size="25px" />
+                      </span>
                     )}
                   </div>
                 </div>
@@ -180,7 +182,7 @@ const Layers = ({ layers }) => {
         key={0}
       >
         <span className="uk-margin-small-right">
-          <MdAddBox size="25px" />
+          <MdAddCircleOutline size="25px" />
         </span>{' '}
         Добавить слой
       </button>
