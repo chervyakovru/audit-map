@@ -4,7 +4,7 @@ import UIkit from 'uikit';
 
 import { useHistory, useParams } from 'react-router-dom';
 import { ROUTES } from '../../../Consts';
-import { getBoardsCollection, getLayersCollection, getFileRef } from '../../../api';
+import { getLayersCollection, getFileRef } from '../../../api';
 
 import styles from '../Layers.module.css';
 import EditLayerNameInput from './EditLayerNameInput';
@@ -30,8 +30,6 @@ const LayerItem = ({ layer, isActiveLayer }) => {
 
   const finishEditing = () => {
     const layerRef = getLayersCollection(user.uid, boardId).doc(layer.id);
-    const boardRef = getBoardsCollection(user.uid).doc(boardId);
-    boardRef.update({ lastOpenedLayer: layer.id });
     layerRef.update({ name: inputValue });
 
     setIsEditing(false);

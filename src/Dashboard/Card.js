@@ -97,7 +97,7 @@ const Card = ({ doc }) => {
       });
   };
   const navigateToBoard = () => {
-    history.push(ROUTES.BOARD(doc.id, doc.lastOpenedLayer));
+    history.push(ROUTES.BOARD(doc.id, doc.layerId));
   };
 
   const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();

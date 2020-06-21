@@ -15,12 +15,7 @@ const Layers = ({ layers }) => {
   const addLayer = () => {
     const boardRef = getBoardsCollection(user.uid).doc(boardId);
 
-    boardRef
-      .collection('layers')
-      .add({ name: 'Новый слой', lastUpdate: fbTimestamp })
-      .then(layerRef => {
-        boardRef.update({ lastOpenedLayer: layerRef.id });
-      });
+    boardRef.collection('layers').add({ name: 'Новый слой', lastUpdate: fbTimestamp });
   };
 
   return (
