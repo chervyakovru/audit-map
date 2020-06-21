@@ -11,7 +11,7 @@ import Layers from './Layers';
 import Button from '../Button';
 import styles from './Board.module.css';
 
-const OPEN_LAYERS_WIDTH = 480;
+const OPEN_LAYERS_WIDTH = 30;
 
 const Board = () => {
   const { boardId } = useParams();
@@ -62,26 +62,26 @@ const Board = () => {
         <div className="uk-height-1-1 uk-width-1-1 uk-position-relative uk-background-muted">
           <Layer />
         </div>
-        <div className={`${styles.layersContainer} uk-flex-none`} style={{ width: `${layersWidth}px` }}>
-          <div className="uk-position-relative" style={{ width: `${OPEN_LAYERS_WIDTH}px` }}>
-            <div
-              className={`
+        <div className="uk-position-relative uk-height-1-1 uk-flex-none">
+          <div
+            className={`
                 ${styles.menuButton}
                 uk-position-absolute
-                uk-position-z-index
                 uk-card
                 uk-card-body
                 uk-card-default
                 uk-flex
                 uk-padding-remove
                 `}
-            >
-              <Button onClick={() => setIsLayerOpen(!isLayerOpen)}>
-                {isLayerOpen ? <MdClose size="25px" /> : <MdMenu size="25px" />}
-              </Button>
+          >
+            <Button onClick={() => setIsLayerOpen(!isLayerOpen)}>
+              {isLayerOpen ? <MdClose size="25px" /> : <MdMenu size="25px" />}
+            </Button>
+          </div>
+          <div className={`${styles.layersContainer} uk-height-1-1 uk-flex-none`} style={{ width: `${layersWidth}vw` }}>
+            <div className="uk-height-1-1" style={{ width: `${OPEN_LAYERS_WIDTH}vw` }}>
+              <Layers layers={layers} />
             </div>
-
-            <Layers layers={layers} />
           </div>
         </div>
       </div>
