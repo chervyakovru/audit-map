@@ -12,20 +12,32 @@ const Options = ({ userId, boardId, layerId, point }) => {
   const [visibleViolations, setVisibleViolations] = React.useState(null);
   const [visibleElementsCount, setVisibleElementsCount] = React.useState(ELEMENTS_OFFSET);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const collection = getERCollection();
-      const data = await collection.get();
+  const isChecked = optionId => {
+    return point.violationsId.includes(optionId.toString());
+  };
 
-      const fetchedViolations = data.docs.map(violation => ({
+  const fetchViolations = async () => {
+    const collection = getERCollection();
+    const data = await collection.get();
+
+    const fetchedViolations = data.docs
+      .map(violation => ({
         id: violation.id,
+        checked: isChecked(violation.id),
         ...violation.data(),
-      }));
+      }))
+      .sort((a, b) => {
+        if (a.checked && b.checked) return 0;
+        if (a.checked) return -1;
+        return 1;
+      });
 
-      setViolations(fetchedViolations);
-      setVisibleViolations(fetchedViolations);
-    };
-    fetchData();
+    setViolations(fetchedViolations);
+    setVisibleViolations(fetchedViolations);
+  };
+
+  React.useEffect(() => {
+    fetchViolations();
   }, []);
 
   const removeViolationId = violationId => {
@@ -61,7 +73,7 @@ const Options = ({ userId, boardId, layerId, point }) => {
 
   const updateVisibleViolations = value => {
     if (value.length === 0) {
-      setVisibleViolations(violations);
+      fetchViolations();
       setVisibleElementsCount(ELEMENTS_OFFSET);
       return;
     }
@@ -99,10 +111,6 @@ const Options = ({ userId, boardId, layerId, point }) => {
 
   const onChange = e => {
     setSearchValue(e.target.value);
-  };
-
-  const isChecked = optionId => {
-    return point.violationsId.includes(optionId.toString());
   };
 
   const getText = (text, foundIndexes, searchLength) => {
