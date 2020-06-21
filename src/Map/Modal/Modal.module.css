@@ -1,3 +1,8 @@
+.container {
+  /* uk-tooltip fix */
+  z-index: 1031;
+}
+
 .title {
   border: none;
   border-bottom: 1px solid transparent;
