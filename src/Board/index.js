@@ -67,11 +67,13 @@ const Board = () => {
           style={{ width: `${contentWidth}vw` }}
         >
           <Layer />
-          <BoardPanel disableZIndex position="top-right">
-            <Button onClick={() => setIsLayerOpen(!isLayerOpen)}>
-              {isLayerOpen ? <MdClose size="25px" /> : <MdMenu size="25px" />}
-            </Button>
-          </BoardPanel>
+          <div className={styles.openLayerButton}>
+            <BoardPanel disableZIndex position="top-right">
+              <Button onClick={() => setIsLayerOpen(!isLayerOpen)}>
+                {isLayerOpen ? <MdClose size="25px" /> : <MdMenu size="25px" />}
+              </Button>
+            </BoardPanel>
+          </div>
         </div>
         <div className={`${styles.layersContainer} uk-flex-none`} style={{ width: `${layersWidth}vw` }}>
           <div className="uk-height-1-1" style={{ width: `${OPEN_LAYERS_WIDTH}vw` }}>
