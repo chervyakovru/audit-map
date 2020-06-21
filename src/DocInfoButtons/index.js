@@ -6,21 +6,25 @@ import { ROUTES } from '../Consts';
 import Button from '../Button';
 import BoardPanel from '../BoardPanel';
 import DownloadButton from './DownloadButton';
+import styles from './DocInfoButtons.module.css';
 
 const DocInfoButton = ({ docTitle }) => {
   const history = useHistory();
 
   return (
     <BoardPanel position="top-left">
-      <Button onClick={() => history.push(ROUTES.HOME)} tooltip="На главную">
-        <MdHome size="25px" />
-      </Button>
-      <div className="uk-flex uk-flex-middle">
+      <div
+        style={{
+          borderRight: '1px solid #e5e5e5',
+        }}
+      >
+        <Button onClick={() => history.push(ROUTES.HOME)} tooltip="На главную">
+          <MdHome size="25px" />
+        </Button>
+      </div>
+      <div className={`${styles.title} uk-flex uk-flex-middle`}>
         <h3
-          style={{
-            borderLeft: '1px solid #e5e5e5',
-            borderRight: '1px solid #e5e5e5',
-          }}
+          style={{ borderRight: '1px solid #e5e5e5' }}
           className="
             uk-margin-remove
             uk-display-block

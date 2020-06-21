@@ -36,3 +36,13 @@
 .selected {
   background-color: rgba(30, 135, 240, 0.3);
 }
+
+@media only screen and (max-width: 576px) {
+  .container {
+    padding: 0;
+  }
+
+  .content {
+    padding: 16px;
+  }
+}

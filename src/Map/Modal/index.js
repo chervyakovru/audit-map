@@ -52,15 +52,17 @@ const Modal = ({ pointId }) => {
   return (
     <div
       style={{ background: 'rgba(0, 0, 0, 0.3)' }}
-      className="
+      className={`
+        ${styles.container}
         uk-position-fixed
         uk-position-cover
         uk-position-z-index
-        uk-padding"
+        uk-padding`}
     >
       <div
         ref={content}
-        className="
+        className={`
+          ${styles.content}
           uk-card
           uk-card-body
           uk-card-default
@@ -69,7 +71,7 @@ const Modal = ({ pointId }) => {
           uk-height-1-1
           uk-flex
           uk-flex-column
-          uk-overflow-hidden"
+          uk-overflow-hidden`}
       >
         <button onClick={closeModal} type="button" uk-close="true" className="uk-padding-small uk-position-top-right" />
         {!point.loaded ? (
