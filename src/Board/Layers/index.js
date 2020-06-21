@@ -24,7 +24,8 @@ const Layers = ({ layers }) => {
       uk-padding-small
       uk-flex
       uk-flex-column
-      uk-flex-between uk-height-1-1
+      uk-flex-between
+      uk-height-1-1
     `}
     >
       <div className="uk-margin-small-bottom" style={{ overflow: 'auto' }}>

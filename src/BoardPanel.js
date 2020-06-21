@@ -7,11 +7,11 @@ const POSITIONS = Object.freeze({
   'bottom-right': 'uk-position-bottom-right',
 });
 
-const BoardPanel = ({ children, position }) => {
+const BoardPanel = ({ children, position, disableZIndex }) => {
   return (
     <div
       className={`
-        uk-position-z-index
+        ${disableZIndex ? '' : 'uk-position-z-index'}
         uk-card
         uk-card-body
         uk-card-default

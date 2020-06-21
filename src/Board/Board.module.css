@@ -1,9 +1,8 @@
-.layersContainer {
-  overflow: hidden;
+.content {
   transition: width 0.3s;
 }
 
-.menuButton {
-  top: 16px;
-  left: -70px;
+.layersContainer {
+  overflow: hidden;
+  transition: width 0.3s;
 }
