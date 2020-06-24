@@ -1,6 +1,6 @@
 import React from 'react';
 import UIkit from 'uikit';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
 import { MdMoreHoriz } from 'react-icons/md';
@@ -8,19 +8,19 @@ import { AiOutlineFileImage } from 'react-icons/ai';
 
 import { fbTimestamp, getBoardsCollection, getFileRef } from '../api';
 import { useOutsideClick, notificationDate } from '../utils';
+import { ROUTES } from '../Consts';
 
 import styles from './Dashboard.module.css';
 
 const Card = ({ doc }) => {
   const history = useHistory();
   const { user } = useStoreon('user');
-  const { path } = useRouteMatch();
 
   const [selected, setSelected] = React.useState(false);
   const [thumbnail, setThumbnail] = React.useState({
     data: null,
     loaded: false,
-    isExist: false
+    isExist: false,
   });
   const moreButtonRef = React.useRef();
   const dropdownRef = React.useRef();
@@ -35,6 +35,7 @@ const Card = ({ doc }) => {
         setThumbnail({ data: url, loaded: true, exist: true });
       })
       .catch(error => {
+        // eslint-disable-next-line no-console
         console.log('error: ', error);
         setThumbnail({ data: null, loaded: true, exist: false });
       });
@@ -45,8 +46,6 @@ const Card = ({ doc }) => {
   const onSelect = e => {
     e.preventDefault();
     e.stopPropagation();
-
-    setSelected(true);
   };
   const onRename = e => {
     e.preventDefault();
@@ -58,7 +57,7 @@ const Card = ({ doc }) => {
       .prompt('Название документа:', doc.name, {
         labels: { cancel: 'Отмена', ok: 'Сохранить' },
         bgClose: true,
-        escClose: true
+        escClose: true,
       })
       .then(name => {
         const documentRef = getBoardsCollection(user.uid).doc(doc.id);
@@ -75,7 +74,7 @@ const Card = ({ doc }) => {
     const collection = getBoardsCollection(user.uid);
     collection.add({
       name: `${doc.name} (Копия)`,
-      lastUpdate: fbTimestamp
+      lastUpdate: fbTimestamp,
     });
   };
   const onDelete = e => {
@@ -88,16 +87,17 @@ const Card = ({ doc }) => {
       .confirm('Вы уверены, что хотите удалить проект?', {
         labels: { cancel: 'Отмена', ok: 'Да' },
         bgClose: true,
-        escClose: true
+        escClose: true,
       })
       .then(() => {
+        getFileRef(user.uid, doc.id, doc.mapName).delete();
         getBoardsCollection(user.uid)
           .doc(doc.id)
           .delete();
       });
   };
-  const goTo = () => {
-    history.push(`${path}/board/${doc.id}`);
+  const navigateToBoard = () => {
+    history.push(ROUTES.BOARD(doc.id, doc.layerId));
   };
 
   const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();
@@ -113,7 +113,7 @@ const Card = ({ doc }) => {
         uk-position-relative`}
       onMouseEnter={() => setSelected(true)}
       onMouseLeave={() => setSelected(false)}
-      onClick={goTo}
+      onClick={navigateToBoard}
       role="button"
       tabIndex={0}
       onKeyPress={() => {}}
@@ -167,30 +167,18 @@ const Card = ({ doc }) => {
       >
         <ul className={`${styles.dropdown} uk-nav uk-dropdown-nav`}>
           <li>
-            <button
-              onClick={onRename}
-              type="button"
-              className={styles.listElement}
-            >
+            <button onClick={onRename} type="button" className={styles.listElement}>
               Переименовать
             </button>
           </li>
           <li>
-            <button
-              onClick={onDouble}
-              type="button"
-              className={styles.listElement}
-            >
+            <button onClick={onDouble} type="button" className={styles.listElement}>
               Дублировать
             </button>
           </li>
           <li className="uk-nav-divider uk-margin-remove" />
           <li>
-            <button
-              onClick={onDelete}
-              type="button"
-              className={`${styles.listElement} uk-text-danger`}
-            >
+            <button onClick={onDelete} type="button" className={`${styles.listElement} uk-text-danger`}>
               Удалить
             </button>
           </li>

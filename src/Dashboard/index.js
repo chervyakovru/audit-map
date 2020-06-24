@@ -9,36 +9,47 @@ import AddNewCard from './AddNewCard';
 const Dashboard = () => {
   const [documents, setDocuments] = React.useState({ data: [], loaded: false });
   const { user } = useStoreon('user');
+  const getBoardsData = async boardsSnapshot => {
+    const fetchedDocumentsPromises = boardsSnapshot.docs.map(doc => {
+      // Dirty hack. Dont know how to do better
+      return doc.ref
+        .collection('layers')
+        .get()
+        .then(layersSnapshot => {
+          return {
+            layerId: layersSnapshot.docs[0].id,
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+    });
+    const fetchedDocuments = await Promise.all(fetchedDocumentsPromises);
+    setDocuments({ data: fetchedDocuments, loaded: true });
+  };
 
   React.useEffect(() => {
     const query = getBoardsCollection(user.uid).orderBy('lastUpdate', 'desc');
 
     return query.onSnapshot(querySnapshot => {
-      const fetchedDocuments = querySnapshot.docs.map(doc => {
-        return {
-          id: doc.id,
-          ...doc.data()
-        };
-      });
-      setDocuments({ data: fetchedDocuments, loaded: true });
+      getBoardsData(querySnapshot);
     });
   }, []);
 
   const createNewBoard = () => {
-    getBoardsCollection(user.uid).add({
-      name: 'Новый документ',
-      lastUpdate: fbTimestamp
-    });
+    getBoardsCollection(user.uid)
+      .add({
+        name: 'Новый документ',
+        lastUpdate: fbTimestamp,
+      })
+      .then(docRef => {
+        docRef.collection('layers').add({ name: 'Новый слой', lastUpdate: fbTimestamp });
+      });
   };
 
   return (
     <>
       <Header />
-      <div
-        className="uk-section"
-        style={{ height: 'calc(100% - 80px)' }}
-        uk-overflow-auto="true"
-      >
+      <div className="uk-section" style={{ height: 'calc(100% - 80px)' }} uk-overflow-auto="true">
         <div className="uk-container">
           <div
             className="

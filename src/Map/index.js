@@ -5,7 +5,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 import UIkit from 'uikit';
 
-import { getBoardsCollection, getPointsCollection } from '../api';
+import { getPointsCollection } from '../api';
 import { getRounded } from '../utils';
 
 import ZoomButtons from './ZoomButtons';
@@ -16,34 +16,21 @@ import styles from './Map.module.css';
 
 const handleKeyPress = () => {};
 
-const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
-  const { docId } = useParams();
+const MapComponent = ({ image }) => {
+  const { boardId, layerId } = useParams();
   const location = useLocation();
   const { user } = useStoreon('user');
 
   const [dragging, setDragging] = React.useState(false);
-  const [doc, setDoc] = React.useState(defaultDocument);
-  const [points, setPoints] = React.useState(defaultPoints);
+  const [points, setPoints] = React.useState([]);
 
   const mapRef = React.useRef(null);
 
   React.useEffect(() => {
-    getBoardsCollection(user.uid)
-      .doc(docId)
-      .onSnapshot(snapshot => {
-        const fetchedDocument = {
-          ...snapshot.data(),
-          id: snapshot.id
-        };
-        setDoc(fetchedDocument);
-      });
-  }, []);
-
-  React.useEffect(() => {
-    getPointsCollection(user.uid, docId).onSnapshot(querySnapshot => {
+    getPointsCollection(user.uid, boardId, layerId).onSnapshot(querySnapshot => {
       const fetchedPoints = querySnapshot.docs.map(point => ({
         id: point.id,
-        ...point.data()
+        ...point.data(),
       }));
       setPoints(fetchedPoints);
     });
@@ -73,10 +60,10 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       x: percentX,
       y: percentY,
       name: `Новая точка`,
-      violationsId: []
+      violationsId: [],
     };
 
-    const pointsCollection = getPointsCollection(user.uid, docId);
+    const pointsCollection = getPointsCollection(user.uid, boardId, layerId);
     pointsCollection.add(newPoint);
   };
 
@@ -85,10 +72,10 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       .confirm(`Вы уверены, что хотите удалить точку "${point.name}"?`, {
         labels: { cancel: 'Отмена', ok: 'Да' },
         bgClose: true,
-        escClose: true
+        escClose: true,
       })
       .then(() => {
-        const pointRef = getPointsCollection(user.uid, docId).doc(point.id);
+        const pointRef = getPointsCollection(user.uid, boardId, layerId).doc(point.id);
         pointRef.delete();
       });
   };
@@ -100,16 +87,16 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       <TransformWrapper
         options={{
           limitToBounds: false,
-          minScale: 0.5
+          minScale: 0.5,
         }}
         doubleClick={{
-          disabled: true
+          disabled: true,
         }}
         wheel={{
-          step: 50
+          step: 50,
         }}
         zoomIn={{
-          step: 10
+          step: 10,
         }}
         defaultScale={1}
         onPanning={onPanning}
@@ -117,12 +104,7 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
       >
         {({ zoomIn, zoomOut, resetTransform, scale }) => (
           <>
-            <ZoomButtons
-              zoomIn={zoomIn}
-              zoomOut={zoomOut}
-              scale={scale}
-              resetTransform={resetTransform}
-            />
+            <ZoomButtons zoomIn={zoomIn} zoomOut={zoomOut} scale={scale} resetTransform={resetTransform} />
             <TransformComponent>
               <div
                 ref={mapRef}
@@ -132,25 +114,18 @@ const MapComponent = ({ defaultDocument, defaultPoints, image }) => {
                 style={{
                   width: `${image.width}px`,
                   height: `${image.height}px`,
-                  backgroundImage: `url(${image.src})`
+                  backgroundImage: `url(${image.src})`,
                 }}
               >
                 {points.map(point => (
-                  <Point
-                    key={point.id}
-                    onDeletePoint={onDeletePoint}
-                    userId={user.uid}
-                    docId={docId}
-                    scale={scale}
-                    point={point}
-                  />
+                  <Point key={point.id} onDeletePoint={onDeletePoint} scale={scale} point={point} />
                 ))}
               </div>
             </TransformComponent>
           </>
         )}
       </TransformWrapper>
-      {modalPointId && <Modal docId={doc.id} pointId={modalPointId} />}
+      {modalPointId && <Modal pointId={modalPointId} />}
     </>
   );
 };

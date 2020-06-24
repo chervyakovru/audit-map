@@ -7,7 +7,7 @@ const ui = new firebaseui.auth.AuthUI(firebase.auth());
 const PublicHomePage = () => {
   React.useEffect(() => {
     ui.start('#firebaseui-auth-container', {
-      signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID]
+      signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
       // Other config options...
     });
   }, []);

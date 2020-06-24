@@ -10,5 +10,5 @@ export default createStore([
   violations,
   logger,
   persistState(null, { key: 'audit-map' }),
-  crossTab({ key: 'audit-map' })
+  crossTab({ key: 'audit-map' }),
 ]);

@@ -1,5 +1,6 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
+
 import useStoreon from 'storeon/react';
 
 import { getPointsCollection } from '../../api';
@@ -8,7 +9,8 @@ import { useOutsideClick, useKeyUp } from '../../utils';
 import Options from './Options';
 import styles from './Modal.module.css';
 
-const Modal = ({ docId, pointId }) => {
+const Modal = ({ pointId }) => {
+  const { boardId, layerId } = useParams();
   const history = useHistory();
   const { user } = useStoreon('user');
 
@@ -16,12 +18,12 @@ const Modal = ({ docId, pointId }) => {
   const content = React.useRef(null);
 
   React.useEffect(() => {
-    return getPointsCollection(user.uid, docId)
+    return getPointsCollection(user.uid, boardId, layerId)
       .doc(pointId)
       .onSnapshot(snapshot => {
         const fetchedPoint = {
           ...snapshot.data(),
-          id: snapshot.id
+          id: snapshot.id,
         };
         setPoint({ data: fetchedPoint, loaded: true });
       });
@@ -29,7 +31,7 @@ const Modal = ({ docId, pointId }) => {
 
   const onRename = e => {
     const name = e.target.value;
-    const pointRef = getPointsCollection(user.uid, docId).doc(point.data.id);
+    const pointRef = getPointsCollection(user.uid, boardId, layerId).doc(point.data.id);
     pointRef.update({ name });
   };
 
@@ -49,16 +51,18 @@ const Modal = ({ docId, pointId }) => {
 
   return (
     <div
-      style={{ background: 'rgba(0,0,0,.3)' }}
-      className="
+      style={{ background: 'rgba(0, 0, 0, 0.3)' }}
+      className={`
+        ${styles.container}
         uk-position-fixed
         uk-position-cover
         uk-position-z-index
-        uk-padding"
+        uk-padding`}
     >
       <div
         ref={content}
-        className="
+        className={`
+          ${styles.content}
           uk-card
           uk-card-body
           uk-card-default
@@ -67,14 +71,9 @@ const Modal = ({ docId, pointId }) => {
           uk-height-1-1
           uk-flex
           uk-flex-column
-          uk-overflow-hidden"
+          uk-overflow-hidden`}
       >
-        <button
-          onClick={closeModal}
-          type="button"
-          uk-close="true"
-          className="uk-padding-small uk-position-top-right"
-        />
+        <button onClick={closeModal} type="button" uk-close="true" className="uk-padding-small uk-position-top-right" />
         {!point.loaded ? (
           <div className="uk-position-center">
             <div uk-spinner="ratio: 2" />
@@ -87,7 +86,7 @@ const Modal = ({ docId, pointId }) => {
               value={point.data.name}
               onChange={onRename}
             />
-            <Options userId={user.uid} docId={docId} point={point.data} />
+            <Options userId={user.uid} boardId={boardId} layerId={layerId} point={point.data} />
           </>
         )}
       </div>

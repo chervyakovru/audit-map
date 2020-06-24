@@ -1,0 +1,14 @@
+.content {
+  transition: width 0.3s;
+}
+
+.layersContainer {
+  overflow: hidden;
+  transition: width 0.3s;
+}
+
+@media only screen and (max-width: 576px) {
+  .openLayerButton {
+    display: none;
+  }
+}

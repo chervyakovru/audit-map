@@ -4,15 +4,15 @@ import { useDropzone } from 'react-dropzone';
 import { useParams } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
-import { getFileRef, getBoardsCollection } from '../api';
+import { getFileRef, getLayersCollection } from '../api';
 
 const UploadFile = () => {
-  const { docId } = useParams();
+  const { boardId, layerId } = useParams();
   const [loading, setIsLoading] = React.useState(false);
   const { user } = useStoreon('user');
 
   const uploadFileToFB = file => {
-    const mapRef = getFileRef(user.uid, docId, file.name);
+    const mapRef = getFileRef(user.uid, boardId, layerId, file.name);
 
     const uploadTask = mapRef.put(file);
 
@@ -21,16 +21,18 @@ const UploadFile = () => {
       snapshot => {
         const { bytesTransferred, totalBytes } = snapshot;
         const progress = (bytesTransferred / totalBytes) * 100;
+        // eslint-disable-next-line no-console
         console.log('Handle newProgress update. progress: ', progress);
       },
       error => {
-        console.log('Handle unsuccessful uploads. error: ', error);
         setIsLoading(false);
+        // eslint-disable-next-line no-console
+        console.log('Handle unsuccessful uploads. error: ', error);
       },
       () => {
-        const documentRef = getBoardsCollection(user.uid).doc(docId);
-        documentRef.update({
-          mapName: uploadTask.snapshot.ref.name
+        const layerRef = getLayersCollection(user.uid, boardId).doc(layerId);
+        layerRef.update({
+          mapName: uploadTask.snapshot.ref.name,
         });
       }
     );
@@ -38,19 +40,16 @@ const UploadFile = () => {
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
-    onDragEnter: () => console.log('onDragEnter'),
-    onDragLeave: () => console.log('onDragLeave'),
     onDropAccepted: async acceptedFiles => {
       setIsLoading(true);
       const file = acceptedFiles[0];
       uploadFileToFB(file);
     },
-    onDropRejected: () => console.log('onDropRejected'),
-    preventDropOnDocument: false
+    preventDropOnDocument: false,
   });
 
   return (
-    <div className="main">
+    <div className="main cursor-pointer">
       <div {...getRootProps({ className: 'uk-width-1-1 uk-height-1-1' })}>
         <input {...getInputProps()} />
         {loading ? (
@@ -65,13 +64,8 @@ const UploadFile = () => {
             uk-position-center
             uk-padding"
           >
-            <span
-              className="uk-margin-small-right"
-              uk-icon="icon: cloud-upload"
-            />
-            <span className="uk-text-middle">
-              Перетащите файл в окно браузера или нажмите в любом месте
-            </span>
+            <span className="uk-margin-small-right" uk-icon="icon: cloud-upload" />
+            <span className="uk-text-middle">Перетащите файл в окно браузера или нажмите в любом месте</span>
           </div>
         )}
       </div>

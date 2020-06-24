@@ -1,8 +1,8 @@
 export default function(store) {
   store.on('@init', () => ({
-    violations: []
+    violations: [],
   }));
   store.on('violations/set', (prevState, violations) => ({
-    violations
+    violations,
   }));
 }

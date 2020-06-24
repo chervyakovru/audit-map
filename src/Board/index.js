@@ -1,165 +1,51 @@
 import React from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useStoreon from 'storeon/react';
+import { MdMenu, MdClose } from 'react-icons/md';
 
-import { MdHome } from 'react-icons/md';
-import { AiOutlineDownload } from 'react-icons/ai';
+import { getBoardsCollection, getLayersCollection } from '../api';
 
-import {
-  getFileRef,
-  getBoardsCollection,
-  getPointsCollection,
-  getThemesCollection,
-  getERCollection
-} from '../api';
-
-import Map from '../Map';
-import UploadFile from './UploadFile';
+import DocInfoButton from '../DocInfoButtons';
+import Layer from '../Layer';
+import Layers from './Layers';
 import Button from '../Button';
 import BoardPanel from '../BoardPanel';
 
-const getImageSize = (w, h) => {
-  const { clientWidth, clientHeight } = document.documentElement;
-  if (w < clientWidth && h < clientHeight) {
-    return {
-      width: w,
-      height: h
-    };
-  }
-  if (clientWidth < clientHeight) {
-    const ratio = h / w;
-    return {
-      width: clientWidth * 0.9,
-      height: clientWidth * 0.9 * ratio
-    };
-  }
-  const ratio = w / h;
-  return {
-    width: clientHeight * 0.9 * ratio,
-    height: clientHeight * 0.9
-  };
-};
+import styles from './Board.module.css';
+
+const OPEN_LAYERS_WIDTH = 30;
 
 const Board = () => {
-  const history = useHistory();
-  const { docId } = useParams();
+  const { boardId } = useParams();
   const { user } = useStoreon('user');
 
   const [doc, setDoc] = React.useState({ data: {}, loaded: false });
-  const [points, setPoints] = React.useState({ data: [], loaded: false });
-  const [image, setImage] = React.useState({
-    data: {
-      src: '',
-      width: 0,
-      height: 0
-    },
-    loaded: false,
-    exists: false
-  });
-  const formRef = React.useRef(null);
-  const [requestValue, setRequestValue] = React.useState('');
-
-  React.useEffect(() => {
-    if (requestValue.length !== 0) {
-      formRef.current.submit();
-    }
-  }, [requestValue]);
+  const [layers, setLayers] = React.useState({ data: [], loaded: false });
+  const [isLayerOpen, setIsLayerOpen] = React.useState(false);
 
   React.useEffect(() => {
     return getBoardsCollection(user.uid)
-      .doc(docId)
-      .onSnapshot(snapshot => {
+      .doc(boardId)
+      .onSnapshot(boardsSnapshot => {
         const fetchedDocument = {
-          ...snapshot.data(),
-          id: snapshot.id
+          ...boardsSnapshot.data(),
+          id: boardsSnapshot.id,
         };
         setDoc({ data: fetchedDocument, loaded: true });
       });
   }, []);
 
   React.useEffect(() => {
-    if (!doc.loaded) return;
-    if (!doc.data.mapName) {
-      setImage({
-        ...image,
-        loaded: true,
-        exists: false
-      });
-    } else {
-      getFileRef(user.uid, docId, doc.data.mapName)
-        .getDownloadURL()
-        .then(url => {
-          const tmpImg = new Image();
-          tmpImg.addEventListener('load', () => {
-            const imageSize = getImageSize(tmpImg.width, tmpImg.height);
-            setImage({
-              data: {
-                src: url,
-                ...imageSize
-              },
-              loaded: true,
-              exists: true
-            });
-          });
-          tmpImg.src = url;
-        });
-    }
-  }, [doc]);
-
-  React.useEffect(() => {
-    getPointsCollection(user.uid, docId)
-      .get()
-      .then(querySnapshot => {
-        const fetchedPoints = querySnapshot.docs.map(point => ({
-          id: point.id,
-          ...point.data()
-        }));
-        setPoints({ data: fetchedPoints, loaded: true });
-      });
+    getLayersCollection(user.uid, boardId).onSnapshot(layersSnapshot => {
+      const fetchedLayers = layersSnapshot.docs.map(layer => ({
+        ...layer.data(),
+        id: layer.id,
+      }));
+      setLayers({ data: fetchedLayers, loaded: true });
+    });
   }, []);
 
-  const downloadDocument = () => {
-    const pointsRequest = getPointsCollection(user.uid, docId).get();
-    const documentRequest = getBoardsCollection(user.uid)
-      .doc(docId)
-      .get();
-    const themesRequest = getThemesCollection().get();
-    const violationsRequest = getERCollection().get();
-
-    Promise.all([
-      documentRequest,
-      pointsRequest,
-      themesRequest,
-      violationsRequest
-    ]).then(response => {
-      const fetchedPoints = response[1].docs.map(point => point.data());
-      const fetchedThemes = response[2].docs.reduce((acc, theme) => {
-        const data = theme.data();
-        return { ...acc, [data.id]: data.text };
-      }, {});
-      const fetchedViolations = response[3].docs.map(violation =>
-        violation.data()
-      );
-
-      const request = {};
-
-      fetchedPoints.forEach(point => {
-        point.violationsId.forEach(violationId => {
-          const violation = fetchedViolations[violationId];
-          const theme = fetchedThemes[violation.theme_id];
-          if (!(theme in request)) {
-            request[theme] = [];
-          }
-          const text = `${violation.text} (${point.name})`;
-          request[theme].push({ text });
-        });
-      });
-
-      setRequestValue(JSON.stringify(request));
-    });
-  };
-
-  if (!doc.loaded || !image.loaded || !points.loaded) {
+  if (!doc.loaded || !layers.loaded) {
     return (
       <div className="main">
         <div className="uk-position-center uk-text-center">
@@ -169,33 +55,32 @@ const Board = () => {
     );
   }
 
+  const layersWidth = isLayerOpen ? OPEN_LAYERS_WIDTH : 0;
+  const contentWidth = isLayerOpen ? 100 - OPEN_LAYERS_WIDTH : 100;
+
   return (
     <>
-      <BoardPanel title={doc.data.name}>
-        <Button onClick={() => history.push('/dashboard')} tooltip="На главную">
-          <MdHome size="25px" />
-        </Button>
-        <Button onClick={downloadDocument} tooltip="Скачать документ">
-          <form
-            style={{ display: 'none' }}
-            method="POST"
-            action="/api/word/createDocument.php"
-            ref={formRef}
-          >
-            <input type="hidden" name="violations" value={requestValue} />
-          </form>
-          <AiOutlineDownload size="25px" />
-        </Button>
-      </BoardPanel>
-      {!image.exists ? (
-        <UploadFile />
-      ) : (
-        <Map
-          defaultDocument={doc.data}
-          defaultPoints={points.data}
-          image={image.data}
-        />
-      )}
+      <DocInfoButton docTitle={`${doc.data.name}`} />
+      <div className="uk-flex uk-height-1-1 uk-flex-stretch">
+        <div
+          className={`${styles.layersContainer} uk-width-1-1 uk-position-relative uk-background-muted`}
+          style={{ width: `${contentWidth}vw` }}
+        >
+          <Layer />
+          <div className={styles.openLayerButton}>
+            <BoardPanel disableZIndex position="top-right">
+              <Button onClick={() => setIsLayerOpen(!isLayerOpen)}>
+                {isLayerOpen ? <MdClose size="25px" /> : <MdMenu size="25px" />}
+              </Button>
+            </BoardPanel>
+          </div>
+        </div>
+        <div className={`${styles.layersContainer} uk-flex-none`} style={{ width: `${layersWidth}vw` }}>
+          <div className="uk-height-1-1" style={{ width: `${OPEN_LAYERS_WIDTH}vw` }}>
+            <Layers layers={layers} />
+          </div>
+        </div>
+      </div>
     </>
   );
 };

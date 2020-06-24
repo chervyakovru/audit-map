@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-  Link
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect, Link } from 'react-router-dom';
 
 import StoreContext from 'storeon/react/context';
 import useStoreon from 'storeon/react';
@@ -13,6 +7,7 @@ import store from './store';
 
 import firebase from './firebase';
 import PrivateRoute from './Auth/PrivateRoute';
+import { ROUTES } from './Consts';
 
 import Home from './Home';
 import Login from './Login';
@@ -30,13 +25,13 @@ const App = () => {
   return (
     <Router>
       <Switch>
-        <Redirect exact path="/" to="/dashboard" />
-        <PrivateRoute path="/dashboard" component={Home} />
-        <Route path="/login" component={Login} />
-        <Route path="/signup" component={SignUp} />
+        <Redirect exact path={ROUTES.ROOT} to={ROUTES.HOME} />
+        <PrivateRoute path={ROUTES.HOME} component={Home} />
+        <Route path={ROUTES.LOGIN} component={Login} />
+        <Route path={ROUTES.SIGNUP} component={SignUp} />
         <Route path="*">
           <h1>404</h1>
-          <Link to="/">На главную</Link>
+          <Link to={ROUTES.ROOT}>На главную</Link>
         </Route>
       </Switch>
     </Router>
