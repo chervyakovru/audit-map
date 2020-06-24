@@ -4,7 +4,7 @@ import { MdAdd, MdRemove, MdFullscreen, MdFullscreenExit } from 'react-icons/md'
 import BoardPanel from '../BoardPanel';
 import Button from '../Button';
 
-const ZoomButtons = props => {
+const ActionsButtons = props => {
   const [fullscreen, setFullscreen] = React.useState(false);
 
   React.useEffect(() => {
@@ -51,4 +51,4 @@ const ZoomButtons = props => {
   );
 };
 
-export default ZoomButtons;
+export default ActionsButtons;
