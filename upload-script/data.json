@@ -1,1 +1,7 @@
-{}
+{
+  "distPathForData": {
+    "docId": {
+      "filedKey": "filedData"
+    }
+  }
+}
