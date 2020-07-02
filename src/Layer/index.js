@@ -2,14 +2,12 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
-import { MdRotateRight } from 'react-icons/md';
 import { getFileRef, getLayersCollection, getPointsCollection } from '../api';
 
 import UploadFile from '../Board/UploadFile';
 import Map from '../Map';
-import Button from '../Button';
 
-const getImageSize = (w, h) => {
+const getFitScreenImageSize = (w, h) => {
   const { clientWidth, clientHeight } = document.documentElement;
   if (w < clientWidth && h < clientHeight) {
     return {
@@ -31,15 +29,26 @@ const getImageSize = (w, h) => {
   };
 };
 
+const getImageSizeFromUrl = async url => {
+  return new Promise(resolve => {
+    const tmpImg = new Image();
+    tmpImg.addEventListener('load', () => {
+      const imageSize = getFitScreenImageSize(tmpImg.width, tmpImg.height);
+      resolve(imageSize);
+    });
+    tmpImg.src = url;
+  });
+};
+
 const Layer = () => {
   const { boardId, layerId } = useParams();
   const { user } = useStoreon('user');
 
-  const [layer, setLayer] = React.useState({ data: {}, loaded: false });
-  const [points, setPoints] = React.useState({ data: [], loaded: false });
+  const [isRotating, setIsRotating] = React.useState(false);
   const [image, setImage] = React.useState({
     data: {
       src: '',
+      name: '',
       width: 0,
       height: 0,
     },
@@ -48,64 +57,42 @@ const Layer = () => {
   });
 
   React.useEffect(() => {
-    return getLayersCollection(user.uid, boardId)
-      .doc(layerId)
-      .onSnapshot(layerSnapshot => {
-        const fetchedLayer = {
-          ...layerSnapshot.data(),
-          id: layerSnapshot.id,
-        };
-
-        setLayer({ data: fetchedLayer, loaded: true });
-      });
-  }, [layerId]);
-
-  React.useEffect(() => {
-    if (!layer.loaded) return;
-    if (!layer.data.mapName) {
+    const func = async () => {
       setImage({
-        ...image,
-        loaded: true,
+        loaded: false,
         exists: false,
       });
-      return;
-    }
-    getFileRef(user.uid, boardId, layerId, layer.data.mapName)
-      .getDownloadURL()
-      .then(url => {
-        const tmpImg = new Image();
-        tmpImg.addEventListener('load', () => {
-          const imageSize = getImageSize(tmpImg.width, tmpImg.height);
-          setImage({
-            data: {
-              src: url,
-              ...imageSize,
-            },
-            loaded: true,
-            exists: true,
-          });
-        });
-        tmpImg.src = url;
-      });
-  }, [layer]);
 
-  React.useEffect(() => {
-    if (!layer.data.mapName) {
-      setPoints({ data: [], loaded: true });
-      return;
-    }
-    getPointsCollection(user.uid, boardId, layerId)
-      .get()
-      .then(querySnapshot => {
-        const fetchedPoints = querySnapshot.docs.map(point => ({
-          id: point.id,
-          ...point.data(),
-        }));
-        setPoints({ data: fetchedPoints, loaded: true });
+      const layerSnapshot = await getLayersCollection(user.uid, boardId)
+        .doc(layerId)
+        .get();
+
+      const { mapName } = layerSnapshot.data();
+      if (!mapName) {
+        setImage({
+          loaded: true,
+          exists: false,
+        });
+        return;
+      }
+
+      const url = await getFileRef(user.uid, boardId, layerId, mapName).getDownloadURL();
+      const imageSize = await getImageSizeFromUrl(url);
+
+      setImage({
+        data: {
+          src: url,
+          name: mapName,
+          ...imageSize,
+        },
+        loaded: true,
+        exists: true,
       });
+    };
+    func();
   }, [layerId]);
 
-  function rotate(url) {
+  function getRotatedImageData(url) {
     return new Promise(resolve => {
       const tmpImg = new Image();
       tmpImg.crossOrigin = 'anonymous';
@@ -119,43 +106,60 @@ const Layer = () => {
         ctx.drawImage(tmpImg, 0, 0, tmpImg.width, tmpImg.height);
 
         canvas.toBlob(blob => {
-          const newImageUrl = URL.createObjectURL(blob);
-
-          resolve({ src: newImageUrl, width: canvas.width, height: canvas.height });
+          resolve({ blob, width: canvas.width, height: canvas.height });
         });
       });
       tmpImg.src = url;
     });
   }
 
-  const handleChange = async () => {
-    const data = await rotate(image.data.src);
-    const imageSize = getImageSize(data.width, data.height);
-
-    setImage({
-      data: {
-        src: data.src,
-        ...imageSize,
-      },
-      loaded: true,
-      exists: true,
-    });
-
-    getPointsCollection(user.uid, boardId, layerId)
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.docs.forEach(point => {
-          const newX = -point.data().y < 0 ? -point.data().y + 100 : -point.data().y;
-          const newY = point.data().x < 0 ? point.data().x + 100 : point.data().x;
-          point.ref.update({
-            x: newX,
-            y: newY,
-          });
-        });
+  const rotatePoints = async () => {
+    const querySnapshot = await getPointsCollection(user.uid, boardId, layerId).get();
+    querySnapshot.docs.forEach(point => {
+      const newX = -point.data().y < 0 ? -point.data().y + 100 : -point.data().y;
+      const newY = point.data().x < 0 ? point.data().x + 100 : point.data().x;
+      point.ref.update({
+        x: newX,
+        y: newY,
       });
+    });
   };
 
-  if (!layer.loaded || !image.loaded || !points.loaded) {
+  const uploadImage = blob => {
+    return new Promise(resolve => {
+      const mapRef = getFileRef(user.uid, boardId, layerId, image.data.name);
+      mapRef.put(blob).then(() => {
+        resolve();
+      });
+    });
+  };
+
+  const rotateImage = async () => {
+    const rotatedImageData = await getRotatedImageData(image.data.src);
+    await uploadImage(rotatedImageData.blob);
+
+    URL.revokeObjectURL(image.data.src);
+    const newImageUrl = URL.createObjectURL(rotatedImageData.blob);
+    const fitScreenImageSize = getFitScreenImageSize(rotatedImageData.width, rotatedImageData.height);
+    setImage({
+      ...image,
+      data: {
+        src: newImageUrl,
+        ...fitScreenImageSize,
+      },
+    });
+  };
+
+  const handleRotate = async () => {
+    if (!isRotating) {
+      setIsRotating(true);
+      await rotateImage();
+      await rotatePoints();
+      setIsRotating(false);
+    }
+  };
+
+  if (!image.loaded) {
     return (
       <div className="main">
         <div className="uk-position-center uk-text-center">
@@ -168,14 +172,8 @@ const Layer = () => {
   if (!image.exists) {
     return <UploadFile />;
   }
-  return (
-    <>
-      <Button onClick={handleChange} tooltip="Повернуть по часовой стрелке">
-        <MdRotateRight size="25px" />
-      </Button>
-      <Map defaultLayer={layer.data} image={image.data} />
-    </>
-  );
+
+  return <Map image={image.data} handleRotate={handleRotate} />;
 };
 
 export default Layer;

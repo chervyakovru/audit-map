@@ -16,7 +16,7 @@ import styles from './Map.module.css';
 
 const handleKeyPress = () => {};
 
-const MapComponent = ({ image }) => {
+const MapComponent = ({ image, handleRotate }) => {
   const { boardId, layerId } = useParams();
   const location = useLocation();
   const { user } = useStoreon('user');
@@ -104,7 +104,13 @@ const MapComponent = ({ image }) => {
       >
         {({ zoomIn, zoomOut, resetTransform, scale }) => (
           <>
-            <ActionsButtons zoomIn={zoomIn} zoomOut={zoomOut} scale={scale} resetTransform={resetTransform} />
+            <ActionsButtons
+              zoomIn={zoomIn}
+              zoomOut={zoomOut}
+              scale={scale}
+              resetTransform={resetTransform}
+              rotateImage={handleRotate}
+            />
             <TransformComponent>
               <div
                 ref={mapRef}
