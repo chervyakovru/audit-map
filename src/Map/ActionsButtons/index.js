@@ -4,6 +4,7 @@ import { MdAdd, MdRemove } from 'react-icons/md';
 import BoardPanel from '../../BoardPanel';
 import Button from '../../Button';
 import FullScreenButton from './FullScreenButton';
+import RotateButton from './RotateButton';
 
 const ActionsButtons = props => {
   const { zoomIn, zoomOut, resetTransform, scale } = props;
@@ -19,6 +20,7 @@ const ActionsButtons = props => {
       <Button onClick={resetTransform} tooltip="Масштаб 100%">
         <b>{Math.round(scale * 100)}%</b>
       </Button>
+      <RotateButton />
       <FullScreenButton />
     </BoardPanel>
   );
