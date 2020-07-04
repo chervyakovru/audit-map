@@ -9,6 +9,13 @@ import Map from '../Map';
 
 import { getImageSizeFromUrl, getFitScreenImageSize, getRotatedImageData, getRotatedCoordinate } from './utils';
 
+const DELAY = 1000;
+
+const PREVENT_CLOSE_TAB_FUNC = e => {
+  e.preventDefault();
+  e.returnValue = '';
+};
+
 const Layer = () => {
   const { boardId, layerId } = useParams();
   const { user } = useStoreon('user');
@@ -68,16 +75,16 @@ const Layer = () => {
         currentUploadTask.current.cancel();
       }
       const imageRef = getFileRef(user.uid, boardId, layerId, image.data.name);
+      window.addEventListener('beforeunload', PREVENT_CLOSE_TAB_FUNC, false);
       const uploadTask = imageRef.put(blob);
       currentUploadTask.current = uploadTask;
       uploadTask.on('state_changed', null, null, () => {
         currentUploadTask.current = null;
+        window.removeEventListener('beforeunload', PREVENT_CLOSE_TAB_FUNC, false);
         resolve();
       });
     });
   };
-
-  const DELAY = 1000;
 
   const debouncedUpload = blob => {
     clearTimeout(debounceRef.current);
