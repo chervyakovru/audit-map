@@ -13,7 +13,8 @@ const Layer = () => {
   const { boardId, layerId } = useParams();
   const { user } = useStoreon('user');
 
-  const [isRotating, setIsRotating] = React.useState(false);
+  const currentUploadTask = React.useRef(null);
+  const debounceRef = React.useRef(null);
   const [image, setImage] = React.useState({
     data: {
       src: '',
@@ -61,9 +62,26 @@ const Layer = () => {
     loadImage();
   }, [layerId]);
 
-  const uploadImage = async blob => {
-    const imageRef = getFileRef(user.uid, boardId, layerId, image.data.name);
-    await imageRef.put(blob);
+  const uploadImage = blob => {
+    return new Promise(resolve => {
+      if (currentUploadTask.current) {
+        currentUploadTask.current.cancel();
+      }
+      const imageRef = getFileRef(user.uid, boardId, layerId, image.data.name);
+      const uploadTask = imageRef.put(blob);
+      currentUploadTask.current = uploadTask;
+      uploadTask.on('state_changed', null, null, () => {
+        currentUploadTask.current = null;
+        resolve();
+      });
+    });
+  };
+
+  const DELAY = 1000;
+
+  const debouncedUpload = blob => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => uploadImage(blob), DELAY);
   };
 
   const rotateAndUploadPoints = async () => {
@@ -81,27 +99,22 @@ const Layer = () => {
   };
 
   const handleRotate = async () => {
-    if (!isRotating) {
-      setIsRotating(true);
-      const rotatedImageData = await getRotatedImageData(image.data.src);
+    const rotatedImageData = await getRotatedImageData(image.data.src);
 
-      await uploadImage(rotatedImageData.blob);
-      await rotateAndUploadPoints();
+    debouncedUpload(rotatedImageData.blob);
+    rotateAndUploadPoints();
 
-      const rotatedImageUrl = URL.createObjectURL(rotatedImageData.blob);
+    const rotatedImageUrl = URL.createObjectURL(rotatedImageData.blob);
+    const fitScreenImageSize = getFitScreenImageSize(document.documentElement, rotatedImageData);
 
-      const fitScreenImageSize = getFitScreenImageSize(document.documentElement, rotatedImageData);
-
-      setImage({
-        ...image,
-        data: {
-          src: rotatedImageUrl,
-          ...fitScreenImageSize,
-        },
-      });
-
-      setIsRotating(false);
-    }
+    setImage({
+      ...image,
+      data: {
+        ...image.data,
+        src: rotatedImageUrl,
+        ...fitScreenImageSize,
+      },
+    });
   };
 
   if (!image.loaded) {
