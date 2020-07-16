@@ -7,37 +7,25 @@ import { getFileRef, getLayersCollection, getPointsCollection } from '../api';
 import UploadFile from '../Board/UploadFile';
 import Map from '../Map';
 
-const getImageSize = (w, h) => {
-  const { clientWidth, clientHeight } = document.documentElement;
-  if (w < clientWidth && h < clientHeight) {
-    return {
-      width: w,
-      height: h,
-    };
-  }
-  if (clientWidth < clientHeight) {
-    const ratio = h / w;
-    return {
-      width: clientWidth * 0.9,
-      height: clientWidth * 0.9 * ratio,
-    };
-  }
-  const ratio = w / h;
-  return {
-    width: clientHeight * 0.9 * ratio,
-    height: clientHeight * 0.9,
-  };
+import { getImageSizeFromUrl, getFitScreenImageSize, getRotatedImageData, getRotatedCoordinate } from './utils';
+
+const DELAY = 1000;
+
+const PREVENT_CLOSE_TAB_FUNC = e => {
+  e.preventDefault();
+  e.returnValue = '';
 };
 
 const Layer = () => {
   const { boardId, layerId } = useParams();
   const { user } = useStoreon('user');
 
-  const [layer, setLayer] = React.useState({ data: {}, loaded: false });
-  const [points, setPoints] = React.useState({ data: [], loaded: false });
+  const currentUploadTask = React.useRef(null);
+  const debounceRef = React.useRef(null);
   const [image, setImage] = React.useState({
     data: {
       src: '',
+      name: '',
       width: 0,
       height: 0,
     },
@@ -46,64 +34,97 @@ const Layer = () => {
   });
 
   React.useEffect(() => {
-    return getLayersCollection(user.uid, boardId)
-      .doc(layerId)
-      .onSnapshot(layerSnapshot => {
-        const fetchedLayer = {
-          ...layerSnapshot.data(),
-          id: layerSnapshot.id,
-        };
-
-        setLayer({ data: fetchedLayer, loaded: true });
-      });
-  }, [layerId]);
-
-  React.useEffect(() => {
-    if (!layer.loaded) return;
-    if (!layer.data.mapName) {
+    const loadImage = async () => {
       setImage({
-        ...image,
-        loaded: true,
-        exists: false,
+        loaded: false,
       });
-      return;
-    }
-    getFileRef(user.uid, boardId, layerId, layer.data.mapName)
-      .getDownloadURL()
-      .then(url => {
-        const tmpImg = new Image();
-        tmpImg.addEventListener('load', () => {
-          const imageSize = getImageSize(tmpImg.width, tmpImg.height);
-          setImage({
-            data: {
-              src: url,
-              ...imageSize,
-            },
-            loaded: true,
-            exists: true,
-          });
-        });
-        tmpImg.src = url;
-      });
-  }, [layer]);
 
-  React.useEffect(() => {
-    if (!layer.data.mapName) {
-      setPoints({ data: [], loaded: true });
-      return;
-    }
-    getPointsCollection(user.uid, boardId, layerId)
-      .get()
-      .then(querySnapshot => {
-        const fetchedPoints = querySnapshot.docs.map(point => ({
-          id: point.id,
-          ...point.data(),
-        }));
-        setPoints({ data: fetchedPoints, loaded: true });
+      const layerSnapshot = await getLayersCollection(user.uid, boardId)
+        .doc(layerId)
+        .get();
+
+      const { mapName } = layerSnapshot.data();
+      if (!mapName) {
+        setImage({
+          loaded: true,
+          exists: false,
+        });
+        return;
+      }
+
+      const url = await getFileRef(user.uid, boardId, layerId, mapName).getDownloadURL();
+      const size = await getImageSizeFromUrl(url);
+      const fitScreenSize = getFitScreenImageSize(document.documentElement, size);
+
+      setImage({
+        data: {
+          src: url,
+          name: mapName,
+          ...fitScreenSize,
+        },
+        loaded: true,
+        exists: true,
       });
+    };
+    loadImage();
   }, [layerId]);
 
-  if (!layer.loaded || !image.loaded || !points.loaded) {
+  const uploadImage = blob => {
+    return new Promise(resolve => {
+      if (currentUploadTask.current) {
+        currentUploadTask.current.cancel();
+      }
+      const imageRef = getFileRef(user.uid, boardId, layerId, image.data.name);
+      window.addEventListener('beforeunload', PREVENT_CLOSE_TAB_FUNC, false);
+      const uploadTask = imageRef.put(blob);
+      currentUploadTask.current = uploadTask;
+      uploadTask.on('state_changed', null, null, () => {
+        currentUploadTask.current = null;
+        window.removeEventListener('beforeunload', PREVENT_CLOSE_TAB_FUNC, false);
+        resolve();
+      });
+    });
+  };
+
+  const debouncedUpload = blob => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => uploadImage(blob), DELAY);
+  };
+
+  const rotateAndUploadPoints = async () => {
+    const pointsSnapshot = await getPointsCollection(user.uid, boardId, layerId).get();
+    await Promise.all(
+      pointsSnapshot.docs.map(point => {
+        const { x, y } = point.data();
+        const [newX, newY] = getRotatedCoordinate(x, y);
+        return point.ref.update({
+          x: newX,
+          y: newY,
+        });
+      })
+    );
+  };
+
+  const handleRotate = async () => {
+    const rotatedImageData = await getRotatedImageData(image.data.src);
+
+    debouncedUpload(rotatedImageData.blob);
+    rotateAndUploadPoints();
+
+    const rotatedImageUrl = URL.createObjectURL(rotatedImageData.blob);
+    const fitScreenImageSize = getFitScreenImageSize(document.documentElement, rotatedImageData);
+
+    setImage({
+      ...image,
+      data: {
+        ...image.data,
+        src: rotatedImageUrl,
+        ...fitScreenImageSize,
+      },
+    });
+  };
+
+  if (!image.loaded) {
     return (
       <div className="main">
         <div className="uk-position-center uk-text-center">
@@ -116,7 +137,8 @@ const Layer = () => {
   if (!image.exists) {
     return <UploadFile />;
   }
-  return <Map defaultLayer={layer.data} image={image.data} />;
+
+  return <Map image={image.data} handleRotate={handleRotate} />;
 };
 
 export default Layer;
