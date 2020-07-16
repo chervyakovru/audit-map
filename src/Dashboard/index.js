@@ -2,7 +2,7 @@ import React from 'react';
 import useStoreon from 'storeon/react';
 import { fbTimestamp, getBoardsCollection } from '../api';
 
-import Header from './Header';
+import Header from '../Header';
 import Card from './Card';
 import AddNewCard from './AddNewCard';
 
