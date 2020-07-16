@@ -80,7 +80,7 @@ const Violations = ({ originViolations, handleOriginTextChange }) => {
       <div className="uk-margin-bottom">
         <Search value={searchValue} onValueChange={setSearchValue} />
       </div>
-      <div uk-overflow-auto="true">
+      <>
         {displayingViolations.length === 0 ? (
           <p>Нет совпадений. Позже тут появиться возможность добавить новое нарушение</p>
         ) : (
@@ -102,7 +102,7 @@ const Violations = ({ originViolations, handleOriginTextChange }) => {
             })}
           </ul>
         )}
-      </div>
+      </>
     </>
   );
 };

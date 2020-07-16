@@ -2,41 +2,57 @@ import React from 'react';
 import Header from '../Header';
 import ViolationsList from '../ViolationsList';
 import ViolationsDownloadButton from './ViolationsDownloadButton';
-
-const MOCK_VIOLATIONS = [
-  {
-    text:
-      'Выход из помещения насосной выполнить непосредственно наружу, или на лестничную клетку имеющий выход непосредственно наружу. (осн. 4.2.2. СП 10.13130.2009)',
-    id: 0,
-  },
-  {
-    text:
-      'Выполнить противопожарной 2-го типа дверь пожарной насосной (подвальный этаж). (осн. 4.2.2. СП 10.13130.2009)',
-    id: 1,
-  },
-  {
-    text:
-      'Противопожарную дверь вентиляционной камеры (подвальный этаж поз.12) оборудовать устройством самозакрывания и аншлагом, на котором указать категорию по взрывопожарной опасности и класс зон по ПУЭ. (осн. п. 20. «Правила противопожарного режима в Российской Федерации» утверждены постановлением Правительства Российской Федерации» от 25 апреля 2012 г. N 390 «О противопожарном режиме»)',
-    id: 2,
-  },
-];
+import { getERCollection } from '../api';
 
 const Violations = () => {
+  const [violations, setViolations] = React.useState({ data: [], isLoaded: false });
+
+  const fetchViolations = async () => {
+    const collection = getERCollection();
+    const data = await collection.get();
+
+    const fetchedViolations = data.docs
+      .map(violation => ({
+        id: violation.id,
+        checked: false,
+        ...violation.data(),
+      }))
+      .sort((a, b) => {
+        if (a.checked && b.checked) return 0;
+        if (a.checked) return -1;
+        return 1;
+      });
+
+    setViolations({ data: fetchedViolations, isLoaded: true });
+  };
+
+  React.useEffect(() => {
+    fetchViolations();
+  }, []);
+
   return (
-    <>
+    <div className="uk-height-1-1">
       <Header />
-      <div uk-height-viewport="offset-top: true" className="uk-section uk-section-small">
-        <div className="uk-container uk-height-1-1 uk-position-relative">
-          <ViolationsList
-            originViolations={MOCK_VIOLATIONS}
-            handleOriginTextChange={() => console.log('handleTextChange')}
-          />
-        </div>
-        <div className="uk-margin-medium-bottom uk-position-large uk-position-bottom-right">
-          <ViolationsDownloadButton />
-        </div>
+      <div style={{ paddingTop: '50px', height: 'calc(100% - 80px)', boxSizing: 'border-box', overflow: 'auto' }}>
+        {!violations.isLoaded ? (
+          <div className="uk-position-center">
+            <div uk-spinner="ratio: 2" />
+          </div>
+        ) : (
+          <>
+            <div className="uk-container">
+              <ViolationsList
+                originViolations={violations.data}
+                handleOriginTextChange={() => console.log('handleTextChange')}
+              />
+            </div>
+            <div className="uk-margin-medium-bottom uk-position-large uk-position-bottom-right">
+              <ViolationsDownloadButton />
+            </div>
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
