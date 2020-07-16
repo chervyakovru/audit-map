@@ -1,0 +1,20 @@
+.label {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  cursor: pointer;
+}
+
+.listItem.listItem.listItem.listItem {
+  padding: 0;
+  margin: 0;
+}
+
+.textarea {
+  overflow: auto;
+  resize: vertical;
+  word-wrap: break-word;
+}
+
+.text {
+  padding: 5px 11px;
+}

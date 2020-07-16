@@ -1,0 +1,60 @@
+import React from 'react';
+
+import styles from './Violation.module.css';
+import Textarea from './Textarea';
+
+const Violation = ({
+  text,
+  displayingText,
+  selected,
+  isEditing,
+  handleSelectChange,
+  handleIsEditingChange,
+  handleTextChange,
+}) => {
+  const [value, setValue] = React.useState(text);
+
+  const handleContextMenu = e => {
+    e.preventDefault();
+    handleIsEditingChange(true);
+  };
+  const cancelEditing = () => {
+    setValue(text);
+    handleIsEditingChange(false);
+  };
+  const saveEditing = () => {
+    handleIsEditingChange(false);
+    handleTextChange(value);
+  };
+  const handleChange = event => {
+    handleSelectChange(event.target.checked);
+  };
+
+  return (
+    <li className={styles.listItem}>
+      <label className={`${styles.label} uk-flex uk-flex-middle uk-position-relative`}>
+        <input
+          className="uk-checkbox uk-margin-right uk-flex-none"
+          checked={selected ?? false}
+          onChange={handleChange}
+          type="checkbox"
+        />
+        <div className="uk-width-1-1">
+          {isEditing ? (
+            <Textarea value={value} onChange={setValue} cancelEditing={cancelEditing} saveEditing={saveEditing} />
+          ) : (
+            <p
+              onContextMenu={handleContextMenu}
+              onDoubleClick={handleContextMenu}
+              className={`${styles.text} uk-margin-remove`}
+            >
+              {displayingText}
+            </p>
+          )}
+        </div>
+      </label>
+    </li>
+  );
+};
+
+export default Violation;
