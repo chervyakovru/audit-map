@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../Header';
 import ViolationsList from '../ViolationsList';
+import ViolationsDownloadButton from './ViolationsDownloadButton';
 
 const MOCK_VIOLATIONS = [
   {
@@ -24,12 +25,15 @@ const Violations = () => {
   return (
     <>
       <Header />
-      <div className="uk-section uk-section-small">
-        <div className="uk-container">
+      <div uk-height-viewport="offset-top: true" className="uk-section uk-section-small">
+        <div className="uk-container uk-height-1-1 uk-position-relative">
           <ViolationsList
             originViolations={MOCK_VIOLATIONS}
             handleOriginTextChange={() => console.log('handleTextChange')}
           />
+        </div>
+        <div className="uk-margin-medium-bottom uk-position-large uk-position-bottom-right">
+          <ViolationsDownloadButton />
         </div>
       </div>
     </>
