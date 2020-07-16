@@ -29,9 +29,11 @@ const Search = ({ value, onValueChange }) => {
           />
         </form>
       </div>
-      <div className="uk-width-auto">
-        <button onClick={onClearIconClick} className="uk-navbar-dropdown-close" type="button" uk-close="true" />
-      </div>
+      {value.length !== 0 && (
+        <div className="uk-width-auto">
+          <button onClick={onClearIconClick} className="uk-navbar-dropdown-close" type="button" uk-close="true" />
+        </div>
+      )}
     </div>
   );
 };
