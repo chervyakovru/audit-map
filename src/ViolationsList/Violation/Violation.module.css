@@ -1,7 +1,21 @@
 .label {
   padding-top: 20px;
   padding-bottom: 20px;
+  background-color: #fff;
   cursor: pointer;
+  transition: background-color 0.5s;
+}
+
+.label:hover {
+  background-color: #f8f8f8;
+}
+
+.label:active {
+  background-color: #e5e5e5;
+}
+
+.checkbox {
+  margin-top: 9px;
 }
 
 .listItem.listItem.listItem.listItem {

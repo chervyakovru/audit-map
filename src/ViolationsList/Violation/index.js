@@ -32,9 +32,9 @@ const Violation = ({
 
   return (
     <li className={styles.listItem}>
-      <label className={`${styles.label} uk-flex uk-flex-middle uk-position-relative`}>
+      <label className={`${styles.label} uk-flex`}>
         <input
-          className="uk-checkbox uk-margin-right uk-flex-none"
+          className={`${styles.checkbox} uk-checkbox uk-margin-right uk-flex-none`}
           checked={selected ?? false}
           onChange={handleChange}
           type="checkbox"

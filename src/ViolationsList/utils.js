@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Violations.module.css';
+import styles from './ViolationsList.module.css';
 
 export const getDisplayingViolations = (searchValue, violations) => {
   const valueTLC = searchValue.toLowerCase();
