@@ -1,14 +1,11 @@
 {
-  "extends": [
-    "airbnb",
-    "plugin:prettier/recommended",
-    "prettier/react"
-  ],
+  "extends": ["airbnb", "plugin:prettier/recommended", "prettier/react"],
   "plugins": ["prettier"],
   "parser": "babel-eslint",
   "rules": {
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "jsx-a11y/control-has-associated-label": [0],
+    "jsx-a11y/label-has-associated-control": [0],
     "react/prop-types": [0]
   },
   "env": {
