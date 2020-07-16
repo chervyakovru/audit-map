@@ -77,32 +77,28 @@ const Violations = ({ originViolations, handleOriginTextChange }) => {
 
   return (
     <>
-      <div className="uk-margin-bottom">
-        <Search value={searchValue} onValueChange={setSearchValue} />
-      </div>
-      <>
-        {displayingViolations.length === 0 ? (
-          <p>Нет совпадений. Позже тут появиться возможность добавить новое нарушение</p>
-        ) : (
-          <ul ref={listRef} onScroll={onScroll} className="uk-list uk-list-divider uk-list-large">
-            {displayingViolations.slice(0, visibleElementsCount).map(violation => {
-              const text = getDisplayingText(violation.text, searchValue.length, violation.foundIndexes);
-              return (
-                <Violation
-                  key={violation.id}
-                  displayingText={text}
-                  text={violation.text}
-                  selected={isSelected(violation.id)}
-                  isEditing={isEditing(violation.id)}
-                  handleSelectChange={handleSelectChange(violation.id)}
-                  handleIsEditingChange={handleIsEditingChange(violation.id)}
-                  handleTextChange={handleTextChange(violation.id)}
-                />
-              );
-            })}
-          </ul>
-        )}
-      </>
+      <Search value={searchValue} onValueChange={setSearchValue} />
+      {displayingViolations.length === 0 ? (
+        <p>Нет совпадений. Позже тут появиться возможность добавить новое нарушение</p>
+      ) : (
+        <ul ref={listRef} uk-overflow-auto="true" onScroll={onScroll} className="uk-list uk-list-divider uk-list-large">
+          {displayingViolations.slice(0, visibleElementsCount).map(violation => {
+            const text = getDisplayingText(violation.text, searchValue.length, violation.foundIndexes);
+            return (
+              <Violation
+                key={violation.id}
+                displayingText={text}
+                text={violation.text}
+                selected={isSelected(violation.id)}
+                isEditing={isEditing(violation.id)}
+                handleSelectChange={handleSelectChange(violation.id)}
+                handleIsEditingChange={handleIsEditingChange(violation.id)}
+                handleTextChange={handleTextChange(violation.id)}
+              />
+            );
+          })}
+        </ul>
+      )}
     </>
   );
 };

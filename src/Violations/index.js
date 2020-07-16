@@ -31,16 +31,24 @@ const Violations = () => {
   }, []);
 
   return (
-    <div className="uk-height-1-1">
+    <>
       <Header />
-      <div style={{ paddingTop: '50px', height: 'calc(100% - 80px)', boxSizing: 'border-box', overflow: 'auto' }}>
+      <div style={{ paddingTop: '50px', height: 'calc(100% - 80px)', boxSizing: 'border-box' }}>
         {!violations.isLoaded ? (
           <div className="uk-position-center">
             <div uk-spinner="ratio: 2" />
           </div>
         ) : (
           <>
-            <div className="uk-container">
+            <div
+              style={{ boxSizing: 'content-box' }}
+              className={`
+                uk-container
+                uk-height-1-1
+                uk-flex
+                uk-flex-column
+                uk-overflow-hidden`}
+            >
               <ViolationsList
                 originViolations={violations.data}
                 handleOriginTextChange={() => console.log('handleTextChange')}
@@ -52,7 +60,7 @@ const Violations = () => {
           </>
         )}
       </div>
-    </div>
+    </>
   );
 };
 
