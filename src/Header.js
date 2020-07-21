@@ -5,20 +5,15 @@ import { Link, useLocation } from 'react-router-dom';
 import firebase from './firebase';
 import { ROUTES } from './Consts';
 
-const Header = () => {
+const Header = ({ leftPart }) => {
   const location = useLocation();
+  console.log('render Header');
   return (
     <nav className="uk-navbar-container">
       <div className="uk-container ">
         <div className="uk-navbar" uk-navbar="true">
           <div className="uk-navbar-left">
-            <div className="uk-navbar-item">
-              <h3 className="uk-margin-remove">
-                {false &&
-                  ((location.pathname === ROUTES.HOME && 'Доски') ||
-                    (location.pathname === ROUTES.VIOLATIONS && 'Нарушения'))}
-              </h3>
-            </div>
+            <div className="uk-navbar-item">{leftPart}</div>
           </div>
           <div className="uk-navbar-right">
             <div className="uk-navbar-item">
@@ -49,6 +44,4 @@ const Header = () => {
   );
 };
 
-export default function() {
-  return <Header />;
-}
+export default Header;

@@ -3,9 +3,11 @@ import Header from '../Header';
 import ViolationsList from '../ViolationsList';
 import ViolationsDownloadButton from './ViolationsDownloadButton';
 import { getERCollection } from '../api';
+import Search from './Search';
 
 const Violations = () => {
   const [violations, setViolations] = React.useState({ data: [], isLoaded: false });
+  const [searchValue, setSearchValue] = React.useState('');
 
   const fetchViolations = async () => {
     const collection = getERCollection();
@@ -30,9 +32,11 @@ const Violations = () => {
     fetchViolations();
   }, []);
 
+  const getSearch = <Search value={searchValue} onValueChange={setSearchValue} />;
+
   return (
     <>
-      <Header />
+      <Header leftPart={getSearch} />
       <div style={{ paddingTop: '50px', height: 'calc(100% - 80px)', boxSizing: 'border-box' }}>
         {!violations.isLoaded ? (
           <div className="uk-position-center">
@@ -45,13 +49,12 @@ const Violations = () => {
               className={`
                 uk-container
                 uk-height-1-1
-                uk-flex
-                uk-flex-column
                 uk-overflow-hidden`}
             >
               <ViolationsList
                 originViolations={violations.data}
                 handleOriginTextChange={() => console.log('handleTextChange')}
+                searchValue={searchValue}
               />
             </div>
             <div className="uk-margin-medium-bottom uk-position-large uk-position-bottom-right">
