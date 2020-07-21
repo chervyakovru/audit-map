@@ -1,6 +1,13 @@
-.root {
-  position: fixed;
-  top: 0;
-  left: 0;
+.listElement {
   display: block;
+  width: 100%;
+  padding: 10px 25px;
+  border: none;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+}
+
+.listElement:hover {
+  background: #e5e5e5;
 }
