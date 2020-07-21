@@ -37,26 +37,18 @@ const Violations = () => {
   return (
     <>
       <Header leftPart={getSearch} />
-      <div style={{ paddingTop: '50px', height: 'calc(100% - 80px)', boxSizing: 'border-box' }}>
+      <div className="uk-container" style={{ height: 'calc(100% - 80px)' }}>
         {!violations.isLoaded ? (
           <div className="uk-position-center">
             <div uk-spinner="ratio: 2" />
           </div>
         ) : (
           <>
-            <div
-              style={{ boxSizing: 'content-box' }}
-              className={`
-                uk-container
-                uk-height-1-1
-                uk-overflow-hidden`}
-            >
-              <ViolationsList
-                originViolations={violations.data}
-                handleOriginTextChange={() => console.log('handleTextChange')}
-                searchValue={searchValue}
-              />
-            </div>
+            <ViolationsList
+              originViolations={violations.data}
+              handleOriginTextChange={() => console.log('handleTextChange')}
+              searchValue={searchValue}
+            />
             <div className="uk-margin-medium-bottom uk-position-large uk-position-bottom-right">
               <ViolationsDownloadButton />
             </div>

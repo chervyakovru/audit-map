@@ -1,4 +1,5 @@
 import React from 'react';
+import { Scrollbars } from 'react-custom-scrollbars';
 import Violation from './Violation';
 
 import { getDisplayingViolations, getDisplayingText } from './utils';
@@ -11,7 +12,6 @@ const Violations = ({ searchValue, originViolations, handleOriginTextChange }) =
   const [displayingViolations, setDisplayingViolations] = React.useState([]);
   const [visibleElementsCount, setVisibleElementsCount] = React.useState(ELEMENTS_OFFSET);
   const [editingId, setEditingId] = React.useState();
-  const listRef = React.useRef(null);
   const throttleRef = React.useRef(false);
 
   const initializeViolations = async () => {
@@ -61,12 +61,8 @@ const Violations = ({ searchValue, originViolations, handleOriginTextChange }) =
     handleOriginTextChange(violationId, value);
   };
 
-  const onScroll = () => {
-    if (!listRef.current) {
-      return;
-    }
-    const { scrollHeight, scrollTop, clientHeight } = listRef.current;
-    if (scrollHeight - scrollTop <= clientHeight) {
+  const onScroll = ({ top }) => {
+    if (top > 0.9) {
       if (!throttleRef.current) {
         throttleRef.current = true;
         setVisibleElementsCount(visibleElementsCount + ELEMENTS_OFFSET);
@@ -81,16 +77,13 @@ const Violations = ({ searchValue, originViolations, handleOriginTextChange }) =
   const isSelected = id => selectedIds.includes(id);
 
   return (
-    <>
+    <Scrollbars hideTracksWhenNotNeeded onScrollFrame={onScroll} style={{ width: '100%', height: '100%' }}>
       {displayingViolations.length === 0 ? (
-        <p>Нет совпадений. Позже тут появиться возможность добавить новое нарушение</p>
+        <p className="uk-padding uk-padding-remove-horizontal">
+          Нет совпадений. Позже тут появиться возможность добавить новое нарушение
+        </p>
       ) : (
-        <ul
-          ref={listRef}
-          uk-overflow-auto="true"
-          onScroll={onScroll}
-          className="uk-list uk-list-divider uk-list-large uk-flex uk-flex-column uk-height-1-1"
-        >
+        <ul className="uk-list uk-list-divider uk-list-large uk-flex uk-flex-column uk-margin-remove uk-padding uk-padding-remove-horizontal">
           {displayingViolations.slice(0, visibleElementsCount).map(violation => {
             const text = getDisplayingText(violation.text, searchValue.length, violation.foundIndexes);
             return (
@@ -108,7 +101,7 @@ const Violations = ({ searchValue, originViolations, handleOriginTextChange }) =
           })}
         </ul>
       )}
-    </>
+    </Scrollbars>
   );
 };
 
