@@ -1,19 +1,18 @@
 import React from 'react';
 import Violation from './Violation';
-import Search from './Search';
 
 import { getDisplayingViolations, getDisplayingText } from './utils';
 
 const ELEMENTS_OFFSET = 20;
 
-const Violations = ({ originViolations, handleOriginTextChange }) => {
-  const [searchValue, setSearchValue] = React.useState('');
+const Violations = ({ searchValue, originViolations, handleOriginTextChange }) => {
   const [selectedIds, setSelectedIds] = React.useState([]);
   const [violations, setViolations] = React.useState([]);
   const [displayingViolations, setDisplayingViolations] = React.useState([]);
   const [visibleElementsCount, setVisibleElementsCount] = React.useState(ELEMENTS_OFFSET);
   const [editingId, setEditingId] = React.useState();
   const listRef = React.useRef(null);
+  const throttleRef = React.useRef(false);
 
   const initializeViolations = async () => {
     if (!originViolations) {
@@ -67,8 +66,14 @@ const Violations = ({ originViolations, handleOriginTextChange }) => {
       return;
     }
     const { scrollHeight, scrollTop, clientHeight } = listRef.current;
-    if (scrollHeight - scrollTop === clientHeight) {
-      setVisibleElementsCount(visibleElementsCount + ELEMENTS_OFFSET);
+    if (scrollHeight - scrollTop <= clientHeight) {
+      if (!throttleRef.current) {
+        throttleRef.current = true;
+        setVisibleElementsCount(visibleElementsCount + ELEMENTS_OFFSET);
+        setTimeout(() => {
+          throttleRef.current = false;
+        }, 500);
+      }
     }
   };
 
@@ -77,11 +82,15 @@ const Violations = ({ originViolations, handleOriginTextChange }) => {
 
   return (
     <>
-      <Search value={searchValue} onValueChange={setSearchValue} />
       {displayingViolations.length === 0 ? (
         <p>Нет совпадений. Позже тут появиться возможность добавить новое нарушение</p>
       ) : (
-        <ul ref={listRef} uk-overflow-auto="true" onScroll={onScroll} className="uk-list uk-list-divider uk-list-large">
+        <ul
+          ref={listRef}
+          uk-overflow-auto="true"
+          onScroll={onScroll}
+          className="uk-list uk-list-divider uk-list-large uk-flex uk-flex-column uk-height-1-1"
+        >
           {displayingViolations.slice(0, visibleElementsCount).map(violation => {
             const text = getDisplayingText(violation.text, searchValue.length, violation.foundIndexes);
             return (
