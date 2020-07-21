@@ -16,7 +16,7 @@ const Violation = ({
 
   const handleContextMenu = e => {
     e.preventDefault();
-    handleIsEditingChange(true);
+    handleIsEditingChange(true, e);
   };
   const cancelEditing = () => {
     setValue(text);
@@ -32,7 +32,7 @@ const Violation = ({
 
   return (
     <li className={styles.listItem}>
-      <label className={`${styles.label} uk-flex`}>
+      <label className={`${styles.label} uk-flex`} onContextMenu={handleContextMenu}>
         <input
           className={`${styles.checkbox} uk-checkbox uk-margin-right uk-flex-none`}
           checked={selected ?? false}
@@ -43,13 +43,7 @@ const Violation = ({
           {isEditing ? (
             <Textarea value={value} onChange={setValue} cancelEditing={cancelEditing} saveEditing={saveEditing} />
           ) : (
-            <p
-              onContextMenu={handleContextMenu}
-              onDoubleClick={handleContextMenu}
-              className={`${styles.text} uk-margin-remove`}
-            >
-              {displayingText}
-            </p>
+            <p className={`${styles.text} uk-margin-remove`}>{displayingText}</p>
           )}
         </div>
       </label>

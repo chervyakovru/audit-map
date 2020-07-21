@@ -1,41 +1,36 @@
 import React from 'react';
-
-const themes = {
-  light: {
-    foreground: '#000000',
-    background: '#eeeeee',
-  },
-  dark: {
-    foreground: '#ffffff',
-    background: '#222222',
-  },
-};
-
-export const ThemeContext = React.createContext({
-  theme: themes.dark,
-  toggleTheme: () => {},
-});
+import CustomContextMenu from './CustomContextMenu';
+import CustomContextMenuContext, { CustomContextMenuProps } from './CustomContextMenuContext';
 
 class ViolationsWithContext extends React.Component {
   constructor(props) {
     super(props);
 
-    this.toggleTheme = () => {
-      this.setState(state => ({
-        theme: state.theme === themes.dark ? themes.light : themes.dark,
+    this.setCustomContextMenuProps = ({ x, y, menuItems, isVisible }) => {
+      this.setState(() => ({
+        // eslint-disable-next-line react/no-unused-state
+        customContextMenuProps: { x, y, menuItems, isVisible },
       }));
     };
 
     this.state = {
-      theme: themes.light,
       // eslint-disable-next-line react/no-unused-state
-      toggleTheme: this.toggleTheme,
+      customContextMenuProps: CustomContextMenuProps,
+      // eslint-disable-next-line react/no-unused-state
+      setCustomContextMenuProps: this.setCustomContextMenuProps,
     };
   }
 
   render() {
     const { children } = this.props;
-    return <ThemeContext.Provider value={this.state}>{children}</ThemeContext.Provider>;
+    const { customContextMenuProps } = this.state;
+    const { x, y, menuItems, isVisible } = customContextMenuProps;
+    return (
+      <CustomContextMenuContext.Provider value={this.state}>
+        {children}
+        {isVisible && <CustomContextMenu x={x} y={y} menuItems={menuItems} />}
+      </CustomContextMenuContext.Provider>
+    );
   }
 }
 
