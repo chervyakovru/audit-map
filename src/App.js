@@ -13,6 +13,7 @@ import Home from './Home';
 import Violations from './Violations';
 import Login from './Login';
 import SignUp from './SignUp';
+import ViolationsWithContext from './ViolationsWithContext';
 
 const App = () => {
   const { dispatch } = useStoreon();
@@ -23,12 +24,18 @@ const App = () => {
     });
   }, []);
 
+  const MyViolations = () => (
+    <ViolationsWithContext>
+      <Violations />
+    </ViolationsWithContext>
+  );
+
   return (
     <Router>
       <Switch>
         <Redirect exact path={ROUTES.ROOT} to={ROUTES.HOME} />
         <PrivateRoute path={ROUTES.HOME} component={Home} />
-        <PrivateRoute path={ROUTES.VIOLATIONS} component={Violations} />
+        <PrivateRoute path={ROUTES.VIOLATIONS} component={MyViolations} />
         <Route path={ROUTES.LOGIN} component={Login} />
         <Route path={ROUTES.SIGNUP} component={SignUp} />
         <Route path="*">

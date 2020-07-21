@@ -4,10 +4,12 @@ import ViolationsList from '../ViolationsList';
 import ViolationsDownloadButton from './ViolationsDownloadButton';
 import { getERCollection } from '../api';
 import Search from './Search';
+import { ThemeContext } from '../ViolationsWithContext';
 
 const Violations = () => {
   const [violations, setViolations] = React.useState({ data: [], isLoaded: false });
   const [searchValue, setSearchValue] = React.useState('');
+  const theme = React.useContext(ThemeContext);
 
   const fetchViolations = async () => {
     const collection = getERCollection();
@@ -35,7 +37,16 @@ const Violations = () => {
   const getSearch = <Search value={searchValue} onValueChange={setSearchValue} />;
 
   return (
-    <>
+    <div
+      style={{ height: '100%', background: theme.theme.background }}
+      tabIndex={0}
+      onKeyDown={() => {}}
+      role="button"
+      onClick={() => {
+        console.log('onClick');
+        theme.toggleTheme();
+      }}
+    >
       <Header leftPart={getSearch} />
       <div className="uk-container" style={{ height: 'calc(100% - 80px)' }}>
         {!violations.isLoaded ? (
@@ -55,7 +66,7 @@ const Violations = () => {
           </>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
