@@ -103,11 +103,13 @@ const Violations = ({ searchValue, originViolations, handleOriginTextChange }) =
     <Scrollbars autoHide hideTracksWhenNotNeeded onScrollFrame={onScroll} style={{ width: '100%', height: '100%' }}>
       <div className={`${styles.listContainer} uk-container`}>
         {displayingViolations.length === 0 ? (
-          <p className="uk-padding uk-padding-remove-horizontal">
+          <p className={`${styles.notFoundText} uk-padding uk-padding-remove-horizontal`}>
             Нет совпадений. Позже тут появиться возможность добавить новое нарушение
           </p>
         ) : (
-          <ul className="uk-list uk-list-divider uk-list-large uk-flex uk-flex-column uk-margin-remove uk-padding uk-padding-remove-horizontal">
+          <ul
+            className={`${styles.list} uk-list uk-list-divider uk-list-large uk-flex uk-flex-column uk-margin-remove uk-padding uk-padding-remove-horizontal`}
+          >
             {displayingViolations.slice(0, visibleElementsCount).map(violation => {
               const text = getDisplayingText(violation.text, searchValue.length, violation.foundIndexes);
               return (

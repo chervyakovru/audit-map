@@ -6,4 +6,13 @@
   .listContainer {
     padding: 0;
   }
+
+  .notFoundText {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+
+  .list {
+    padding: 10px;
+  }
 }
