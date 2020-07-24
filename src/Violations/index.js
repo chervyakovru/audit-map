@@ -37,7 +37,7 @@ const Violations = () => {
   return (
     <>
       <Header leftPart={getSearch} />
-      <div className="uk-container" style={{ height: 'calc(100% - 80px)' }}>
+      <div style={{ height: 'calc(100% - 80px)' }}>
         {!violations.isLoaded ? (
           <div className="uk-position-center">
             <div uk-spinner="ratio: 2" />
