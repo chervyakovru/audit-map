@@ -5,6 +5,8 @@ import CustomContextMenuContext from '../CustomContextMenuContext';
 
 import { getDisplayingViolations, getDisplayingText } from './utils';
 
+import styles from './ViolationsList.module.css';
+
 const ELEMENTS_OFFSET = 20;
 
 const Violations = ({ searchValue, originViolations, handleOriginTextChange }) => {
@@ -99,7 +101,7 @@ const Violations = ({ searchValue, originViolations, handleOriginTextChange }) =
 
   return (
     <Scrollbars autoHide hideTracksWhenNotNeeded onScrollFrame={onScroll} style={{ width: '100%', height: '100%' }}>
-      <div className="uk-container">
+      <div className={`${styles.listContainer} uk-container`}>
         {displayingViolations.length === 0 ? (
           <p className="uk-padding uk-padding-remove-horizontal">
             Нет совпадений. Позже тут появиться возможность добавить новое нарушение
