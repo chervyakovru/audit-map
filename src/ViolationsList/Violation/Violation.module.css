@@ -1,10 +1,9 @@
 .label {
   padding-top: 20px;
-  padding-right: 10px;
   padding-bottom: 20px;
   background-color: #fff;
   cursor: pointer;
-  transition: background-color 0.5s;
+  transition: background-color 0.3s;
 }
 
 .label:hover {
@@ -15,9 +14,21 @@
   background-color: #e5e5e5;
 }
 
+.checkboxWrap {
+  overflow: hidden;
+  width: 20px;
+  padding-right: 4px;
+  transition-duration: 0.5s;
+  transition-property: width, padding-right;
+}
+
+.checkboxWrapHidden {
+  width: 0;
+  padding-right: 0;
+}
+
 .checkbox {
   margin-top: 8px;
-  margin-right: 10px;
 }
 
 .listItem.listItem.listItem.listItem {
@@ -33,4 +44,22 @@
 
 .text {
   padding: 5px 11px;
+}
+
+.saveButton {
+  width: 0;
+  padding-right: 0;
+  padding-left: 0;
+  border-width: 0;
+  margin-left: 0;
+  transition-duration: 0.3s;
+  transition-property: width, padding-right, padding-left, border-width, margin-left;
+}
+
+.saveButtonExpanded {
+  width: 62px;
+  padding-right: 10px;
+  padding-left: 10px;
+  border-width: 1px;
+  margin-left: 15px;
 }

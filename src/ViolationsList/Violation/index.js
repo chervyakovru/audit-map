@@ -33,18 +33,27 @@ const Violation = ({
   return (
     <li className={styles.listItem}>
       <label className={`${styles.label} uk-flex`} onContextMenu={handleContextMenu}>
-        <input
-          className={`${styles.checkbox} uk-checkbox uk-flex-none`}
-          checked={selected ?? false}
-          onChange={handleChange}
-          type="checkbox"
-        />
-        <div className="uk-width-1-1">
+        <div className={`${styles.checkboxWrap} ${isEditing && styles.checkboxWrapHidden}`}>
+          <input
+            className={`${styles.checkbox} uk-checkbox uk-flex-none`}
+            checked={selected ?? false}
+            onChange={handleChange}
+            type="checkbox"
+          />
+        </div>
+        <div className="uk-width-1-1 uk-flex">
           {isEditing ? (
             <Textarea value={value} onChange={setValue} cancelEditing={cancelEditing} saveEditing={saveEditing} />
           ) : (
-            <p className={`${styles.text} uk-margin-remove`}>{displayingText}</p>
+            <p className={`${styles.text} uk-width-1-1 uk-margin-remove`}>{displayingText}</p>
           )}
+          <button
+            type="button"
+            className={`${styles.saveButton} ${isEditing &&
+              styles.saveButtonExpanded} uk-button uk-button-primary uk-flex-none`}
+          >
+            <span uk-icon="icon: check" />
+          </button>
         </div>
       </label>
     </li>
