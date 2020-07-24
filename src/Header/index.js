@@ -2,12 +2,11 @@ import React from 'react';
 import { MdExitToApp } from 'react-icons/md';
 
 import { Link, useLocation } from 'react-router-dom';
-import firebase from './firebase';
-import { ROUTES } from './Consts';
+import firebase from '../firebase';
+import { ROUTES } from '../Consts';
 
 const Header = ({ leftPart }) => {
   const location = useLocation();
-  console.log('render Header');
   return (
     <nav className="uk-navbar-container">
       <div className="uk-container ">
