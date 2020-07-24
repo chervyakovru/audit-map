@@ -98,7 +98,7 @@ const Violations = ({ searchValue, originViolations, handleOriginTextChange }) =
   const isSelected = id => selectedIds.includes(id);
 
   return (
-    <Scrollbars hideTracksWhenNotNeeded onScrollFrame={onScroll} style={{ width: '100%', height: '100%' }}>
+    <Scrollbars autoHide hideTracksWhenNotNeeded onScrollFrame={onScroll} style={{ width: '100%', height: '100%' }}>
       {displayingViolations.length === 0 ? (
         <p className="uk-padding uk-padding-remove-horizontal">
           Нет совпадений. Позже тут появиться возможность добавить новое нарушение
