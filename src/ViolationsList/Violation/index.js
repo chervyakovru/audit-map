@@ -34,7 +34,7 @@ const Violation = ({
     <li className={styles.listItem}>
       <label className={`${styles.label} uk-flex`} onContextMenu={handleContextMenu}>
         <input
-          className={`${styles.checkbox} uk-checkbox uk-margin-right uk-flex-none`}
+          className={`${styles.checkbox} uk-checkbox uk-flex-none`}
           checked={selected ?? false}
           onChange={handleChange}
           type="checkbox"

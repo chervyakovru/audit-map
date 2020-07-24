@@ -1,5 +1,6 @@
 .label {
   padding-top: 20px;
+  padding-right: 10px;
   padding-bottom: 20px;
   background-color: #fff;
   cursor: pointer;
@@ -15,7 +16,8 @@
 }
 
 .checkbox {
-  margin-top: 9px;
+  margin-top: 8px;
+  margin-right: 10px;
 }
 
 .listItem.listItem.listItem.listItem {
