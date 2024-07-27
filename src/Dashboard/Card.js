@@ -1,6 +1,5 @@
 import React from 'react';
 import UIkit from 'uikit';
-import { useHistory } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 
 import { MdMoreHoriz } from 'react-icons/md';
@@ -13,7 +12,6 @@ import { ROUTES } from '../Consts';
 import styles from './Dashboard.module.css';
 
 const Card = ({ doc }) => {
-  const history = useHistory();
   const { user } = useStoreon('user');
 
   const [selected, setSelected] = React.useState(false);
@@ -96,16 +94,13 @@ const Card = ({ doc }) => {
           .delete();
       });
   };
-  const navigateToBoard = () => {
-    history.push(ROUTES.BOARD(doc.id, doc.layerId));
-  };
 
   const lastUpdateDate = doc.lastUpdate ? doc.lastUpdate.toDate() : new Date();
 
   return (
-    <div
+    <a
       className={`
-        ${styles.card}
+        uk-link-reset
         uk-card
         uk-card-default
         uk-card-small
@@ -113,8 +108,7 @@ const Card = ({ doc }) => {
         uk-position-relative`}
       onMouseEnter={() => setSelected(true)}
       onMouseLeave={() => setSelected(false)}
-      onClick={navigateToBoard}
-      role="button"
+      href={ROUTES.BOARD(doc.id, doc.layerId)}
       tabIndex={0}
       onKeyPress={() => {}}
     >
@@ -184,7 +178,7 @@ const Card = ({ doc }) => {
           </li>
         </ul>
       </div>
-    </div>
+    </a>
   );
 };
 

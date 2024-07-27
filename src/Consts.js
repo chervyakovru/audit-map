@@ -5,5 +5,6 @@ export const ROUTES = {
   SIGNUP: '/signup',
   HOME: '/app',
   BOARD: (boardId, layerId) => `/app/board/${boardId}${layerId ? `/layer/${layerId}` : ''}`,
+  BOARD_EMPTY_LAYER: `/app/board/:boardId`,
   BOARD_MATCH: `/app/board/:boardId/layer/:layerId`,
 };

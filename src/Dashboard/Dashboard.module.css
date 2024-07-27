@@ -6,10 +6,6 @@
   background: #0f6ecd;
 }
 
-.card {
-  cursor: pointer;
-}
-
 .imageContainer {
   height: 220px;
   border-bottom: 1px solid #e5e5e5;

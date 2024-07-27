@@ -10,19 +10,10 @@ const Dashboard = () => {
   const [documents, setDocuments] = React.useState({ data: [], loaded: false });
   const { user } = useStoreon('user');
   const getBoardsData = async boardsSnapshot => {
-    const fetchedDocumentsPromises = boardsSnapshot.docs.map(doc => {
-      // Dirty hack. Dont know how to do better
-      return doc.ref
-        .collection('layers')
-        .get()
-        .then(layersSnapshot => {
-          return {
-            layerId: layersSnapshot.docs[0].id,
-            id: doc.id,
-            ...doc.data(),
-          };
-        });
-    });
+    const fetchedDocumentsPromises = boardsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     const fetchedDocuments = await Promise.all(fetchedDocumentsPromises);
     setDocuments({ data: fetchedDocuments, loaded: true });
   };
