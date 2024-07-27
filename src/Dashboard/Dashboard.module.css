@@ -62,3 +62,23 @@
 .listElement:hover {
   background: #e5e5e5;
 }
+
+.edited {
+  display: none;
+}
+
+@media only screen and (max-width: 576px) {
+  .edited {
+    display: block !important;
+  }
+
+  .imageOverlay {
+    display: none !important;
+  }
+
+  .button,
+  .button:focus,
+  .button:not(:disabled):hover {
+    color: #bfbfbf;
+  }
+}

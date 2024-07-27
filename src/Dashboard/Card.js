@@ -130,7 +130,14 @@ const Card = ({ doc }) => {
       <div className="uk-card-body uk-flex uk-flex-column">
         <p className="uk-margin-remove-bottom uk-text-truncate">{doc.name}</p>
         <small className="uk-text-truncate" style={{ height: '19px' }}>
-          {selected && `Изменено ${notificationDate(lastUpdateDate)}`}
+          <span
+            className={`
+              ${styles.edited} 
+              ${selected ? 'uk-display-block' : null}
+            `}
+          >
+            Изменено {notificationDate(lastUpdateDate)}
+          </span>
         </small>
       </div>
       <button
@@ -139,7 +146,7 @@ const Card = ({ doc }) => {
         onClick={onSelect}
         className={`
           ${styles.button}
-          ${selected ? 'uk-display-block' : null}
+          uk-display-block
           uk-position-z-index
           uk-button
           uk-button-link
