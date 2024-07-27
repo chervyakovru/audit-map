@@ -1,12 +1,15 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import useStoreon from 'storeon/react';
 import { fbTimestamp, getBoardsCollection } from '../api';
+import { ROUTES } from '../Consts';
 
 import Header from './Header';
 import Card from './Card';
 import AddNewCard from './AddNewCard';
 
 const Dashboard = () => {
+  const history = useHistory();
   const [documents, setDocuments] = React.useState({ data: [], loaded: false });
   const { user } = useStoreon('user');
   const getBoardsData = async boardsSnapshot => {
@@ -32,8 +35,9 @@ const Dashboard = () => {
         name: 'Новый документ',
         lastUpdate: fbTimestamp,
       })
-      .then(docRef => {
-        docRef.collection('layers').add({ name: 'Новый слой', lastUpdate: fbTimestamp });
+      .then(async docRef => {
+        const layerRef = await docRef.collection('layers').add({ name: 'Новый слой', lastUpdate: fbTimestamp });
+        history.push(ROUTES.BOARD(docRef.id, layerRef.id));
       });
   };
 
