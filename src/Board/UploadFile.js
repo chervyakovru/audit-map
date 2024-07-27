@@ -6,7 +6,7 @@ import useStoreon from 'storeon/react';
 
 import { getFileRef, getLayersCollection } from '../api';
 
-const UploadFile = () => {
+const UploadFile = ({ onSuccess }) => {
   const { boardId, layerId } = useParams();
   const [loading, setIsLoading] = React.useState(false);
   const { user } = useStoreon('user');
@@ -29,11 +29,12 @@ const UploadFile = () => {
         // eslint-disable-next-line no-console
         console.log('Handle unsuccessful uploads. error: ', error);
       },
-      () => {
+      async () => {
         const layerRef = getLayersCollection(user.uid, boardId).doc(layerId);
-        layerRef.update({
+        await layerRef.update({
           mapName: uploadTask.snapshot.ref.name,
         });
+        onSuccess();
       }
     );
   };

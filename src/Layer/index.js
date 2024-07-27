@@ -32,40 +32,39 @@ const Layer = () => {
     loaded: false,
     exists: false,
   });
+  const loadImage = async () => {
+    setImage({
+      loaded: false,
+    });
 
-  React.useEffect(() => {
-    const loadImage = async () => {
+    const layerSnapshot = await getLayersCollection(user.uid, boardId)
+      .doc(layerId)
+      .get();
+
+    const { mapName } = layerSnapshot.data();
+    if (!mapName) {
       setImage({
-        loaded: false,
-      });
-
-      const layerSnapshot = await getLayersCollection(user.uid, boardId)
-        .doc(layerId)
-        .get();
-
-      const { mapName } = layerSnapshot.data();
-      if (!mapName) {
-        setImage({
-          loaded: true,
-          exists: false,
-        });
-        return;
-      }
-
-      const url = await getFileRef(user.uid, boardId, layerId, mapName).getDownloadURL();
-      const size = await getImageSizeFromUrl(url);
-      const fitScreenSize = getFitScreenImageSize(document.documentElement, size);
-
-      setImage({
-        data: {
-          src: url,
-          name: mapName,
-          ...fitScreenSize,
-        },
         loaded: true,
-        exists: true,
+        exists: false,
       });
-    };
+      return;
+    }
+
+    const url = await getFileRef(user.uid, boardId, layerId, mapName).getDownloadURL();
+    const size = await getImageSizeFromUrl(url);
+    const fitScreenSize = getFitScreenImageSize(document.documentElement, size);
+
+    setImage({
+      data: {
+        src: url,
+        name: mapName,
+        ...fitScreenSize,
+      },
+      loaded: true,
+      exists: true,
+    });
+  };
+  React.useEffect(() => {
     loadImage();
   }, [layerId]);
 
@@ -135,7 +134,7 @@ const Layer = () => {
   }
 
   if (!image.exists) {
-    return <UploadFile />;
+    return <UploadFile onSuccess={loadImage} />;
   }
 
   return <Map image={image.data} handleRotate={handleRotate} />;
