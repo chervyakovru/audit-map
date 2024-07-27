@@ -29,13 +29,21 @@ export const useKeyUp = callback => {
   });
 };
 
-const shortMonthNames = ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
-
 export const notificationDate = date => {
+  const minutes = date
+    .getMinutes()
+    .toString()
+    .padStart(2, '0');
+  const hours = date
+    .getHours()
+    .toString()
+    .padStart(2, '0');
   const day = date.getDate();
-  const monthNumber = date.getMonth();
-  const month = shortMonthNames[monthNumber];
+  const monthNumber = date
+    .getMonth()
+    .toString()
+    .padStart(2, '0');
   const year = date.getFullYear();
 
-  return `${day} ${month} ${year}`;
+  return `${hours}:${minutes} ${day}.${monthNumber}.${year}`;
 };
