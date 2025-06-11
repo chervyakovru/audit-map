@@ -71,7 +71,11 @@ const DownloadButton = () => {
         const data = theme.data();
         return { ...acc, [data.id]: data.text };
       }, {});
-      const fetchedViolations = response[3].docs.map(violation => violation.data());
+
+      const fetchedViolations = response[3].docs.reduce((acc, violation) => {
+        acc[violation.id] = violation.data();
+        return acc;
+      }, {});
 
       const request = {};
 
