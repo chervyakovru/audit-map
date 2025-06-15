@@ -5,5 +5,5 @@ const databaseURL = 'https://audite-map.firebaseio.com';
 
 firestoreService.initializeApp(serviceAccount, databaseURL);
 
-const fileName = 'data.json';
+const fileName = 'downloaded-firestore-data.json';
 firestoreService.restore(fileName);
