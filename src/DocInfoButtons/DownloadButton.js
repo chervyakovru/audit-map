@@ -82,7 +82,7 @@ const DownloadButton = () => {
       fetchedPoints.forEach(point => {
         point.violationsId.forEach(violationId => {
           const violation = fetchedViolations[violationId];
-          const theme = fetchedThemes[violation.theme_id];
+          const theme = fetchedThemes[violation.themeId];
           if (!(theme in request)) {
             request[theme] = [];
           }
